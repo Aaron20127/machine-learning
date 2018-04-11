@@ -14,6 +14,7 @@ and omits many desirable features.
 #### Libraries
 # Standard library
 import random
+import time
 
 # Third-party libraries
 import numpy as np
@@ -59,6 +60,49 @@ class Network(object):
         return a
 
     def SGD(self, training_data, epochs, mini_batch_size, eta,
+         test_data=None):
+        """training_data 是⼀个 (x, y) 元组的列表，表⽰训练输⼊和其对应的期望输出。变量 epochs 和
+        mini_batch_size 表示迭代期数量，和采样时的⼩批量数据的⼤⼩，eta 是学习速率。如果给出了test_data，
+        则训练完成后将使用test_data给训练后的模型进行测试，这将降低整个运行速度。"""
+
+        """Train the neural network using mini-batch stochastic
+        gradient descent.  The ``training_data`` is a list of tuples
+        ``(x, y)`` representing the training inputs and the desired
+        outputs.  The other non-optional parameters are
+        self-explanatory.  If ``test_data`` is provided then the
+        network will be evaluated against the test data after each
+        epoch, and partial progress printed out.  This is useful for
+        tracking progress, but slows things down substantially."""
+        print 'mini_batch_size:', mini_batch_size
+        if test_data: n_test = len(test_data)
+        n = len(training_data)
+        total = 0.0
+        for j in xrange(epochs):
+            #训练数据随机排序
+            random.shuffle(training_data) 
+            #将训练数据每10个一组放入mini_batches，即mini_batches = [[10组],[10组], ...]
+            mini_batches = [
+                training_data[k:k+mini_batch_size]
+                for k in xrange(0, n, mini_batch_size)] 
+            #每训练一批数据后得到新的权重和偏置
+
+            time_start = time.time()
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch, eta)
+            time_end = time.time()
+            execute = time_end - time_start
+            # print 'execute: ', execute
+            total += execute
+
+            if test_data:
+                print "Epoch {0}: {1} / {2}".format(
+                    j, self.evaluate(test_data), n_test)
+            else:
+                print "Epoch {0} complete".format(j)
+
+        print 'total: ', total * 1.0 / epochs, '\n'
+
+    def SGD_matrix(self, training_data, epochs, mini_batch_size, eta,
             test_data=None):
         """training_data 是⼀个 (x, y) 元组的列表，表⽰训练输⼊和其对应的期望输出。变量 epochs 和
         mini_batch_size 表示迭代期数量，和采样时的⼩批量数据的⼤⼩，eta 是学习速率。如果给出了test_data，
@@ -72,23 +116,35 @@ class Network(object):
         network will be evaluated against the test data after each
         epoch, and partial progress printed out.  This is useful for
         tracking progress, but slows things down substantially."""
+        print 'mini_batch_size:', mini_batch_size
         if test_data: n_test = len(test_data)
         n = len(training_data)
+        total = 0.0
         for j in xrange(epochs):
             #训练数据随机排序
-            # random.shuffle(training_data) 
+            random.shuffle(training_data) 
             #将训练数据每10个一组放入mini_batches，即mini_batches = [[10组],[10组], ...]
             mini_batches = [
                 training_data[k:k+mini_batch_size]
                 for k in xrange(0, n, mini_batch_size)] 
             #每训练一批数据后得到新的权重和偏置
+
+            time_start = time.time()
             for mini_batch in mini_batches:
                 self.update_mini_batch_matrix(mini_batch, eta)
+                # self.update_mini_batch(mini_batch, eta)
+            time_end = time.time()
+            execute = time_end - time_start
+            # print 'execute: ', execute
+            total += execute
+
             if test_data:
                 print "Epoch {0}: {1} / {2}".format(
                     j, self.evaluate(test_data), n_test)
             else:
                 print "Epoch {0} complete".format(j)
+
+        print 'total: ', total * 1.0 / epochs,'\n'
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
@@ -97,16 +153,19 @@ class Network(object):
         is the learning rate."""
         # nabla_b和nabla_b生成和self.biases，self.weights相同类型的值为0的矩阵
         nabla_b = [np.zeros(b.shape) for b in self.biases]
-        nabla_w = [np.zeros(w.shape) for w in self.weights]
+        nabla_w = [np.zeros(w.shape) for w in self.weights] 
         # for循环求出10次代价函数产生的梯度dCx相加，得到一次10个数据训练后的代价函数的梯度
         # 在求self.weights和self.biases需要先将dCx的和除以10
+        
+        time_0 = time.time()
         for x, y in mini_batch:
             # 反向传播的算法，⼀种快速计算代价函数的梯度的⽅法，返回每个样本的梯度
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
         # 得到一次小批量训练后网络的权重和偏置,b = b - dC * eta,w = w - dC * eta
-        print nabla_b
+        time_1 = time.time()
+        print 'backprop not matrix: ', (time_1 - time_0) #一次小批量反向传播的时间
 
         self.weights = [w-(eta/len(mini_batch))*nw
                         for w, nw in zip(self.weights, nabla_w)]
@@ -162,17 +221,21 @@ class Network(object):
         nabla_w = [np.zeros(w.shape) for w in self.weights]
         # for循环求出10次代价函数产生的梯度dCx相加，得到一次10个数据训练后的代价函数的梯度
         # 在求self.weights和self.biases需要先将dCx的和除以10
-
-        m_x = [x for x, y in mini_batch]
-        m_y = [y for x, y in mini_batch]
-        
-        m_x = np.array(m_x)
-        m_y = np.array(m_y)
+        time_0 = time.time()
+        m_x = np.array([x for x, y in mini_batch])
+        m_y = np.array([y for x, y in mini_batch])
+        time_1 = time.time() 
 
         m_x = (m_x.reshape(m_x.shape[0],m_x.shape[1])).transpose()
         m_y = (m_y.reshape(m_y.shape[0],m_y.shape[1])).transpose()
 
+        time_2 = time.time()
         nabla_b, nabla_w = self.backprop_matrix(m_x, m_y)
+        time_3 = time.time()
+
+        # ’backprop matrix‘是矩阵执行时间，‘list to matrix’是与列表生成矩阵的时间，
+        # 显然时间被是成矩阵的np.array([])浪费了
+        print '(backprop matrix, list to matrix): ', (time_3 - time_2),',', (time_1 - time_0)
 
         self.weights = [w-(eta/len(mini_batch))*nw
                         for w, nw in zip(self.weights, nabla_w)]
