@@ -21,7 +21,7 @@ net = network.Network([784, 30, 10])
 # 每个小批量数据越多，矩阵向量反向传播的执行越快
 # SGD_matrix执行反而更慢的原因是组装矩阵时将列表生成矩阵np.array([...])很耗时
 
-net.SGD(training_data, 1, 50000, 3.0, test_data = None)
+net.SGD(training_data, 1, 5000, 3.0, test_data = None)
 net.SGD_matrix(training_data, 1, 5000, 3.0, test_data = None)
 
 net.SGD(training_data, 1, 10000, 3.0, test_data = None)
