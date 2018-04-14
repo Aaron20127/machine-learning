@@ -7,16 +7,24 @@ import mnist_loader
 training_data, validation_data, test_data = \
 mnist_loader.load_data_wrapper()
 
-# training_data = training_data[:10]
-# validation_data = validation_data[:10]
-# test_data = test_data[:10]    
+# training_data = training_data[:9]
+# validation_data = validation_data[:9]
+# test_data = test_data[:9]    
 
 # print len(training_data), len(validation_data), len(test_data)
+
 
 import network
 
 # 设置神经网络层数和每层的节点数，这里首层和尾层的节点数只能是784和10
-net = network.Network([784, 30, 10])
+net = network.Network([784, 100, 10])
+net.SGD(training_data, 30, 10, 0.5, test_data = test_data)
 
-# 训练测试数据
-net.SGD(training_data, 30, 10, 3.0, test_data = test_data)
+"""
+import network2
+net = network.Network([784, 100, 10], cost=network2.CrossEntropyCost)
+net = network2.Network([784, 100, 10], cost=network2.CrossEntropyCost)
+net.large_weight_initializer()
+net.SGD(training_data, 30, 10, 0.5, evaluation_data=test_data,
+    monitor_evaluation_accuracy=True)
+"""

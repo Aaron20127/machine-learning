@@ -148,8 +148,7 @@ class Network(object):
             activations.append(activation)
         # backward pass
         # 2.求出输出层的误差delta(L)，适应反向传播的BP1函数,delta = (a(L)-y)*(delta'(z(L)))
-        delta = self.cost_derivative(activations[-1], y) * \
-            sigmoid_prime(zs[-1])
+        delta = self.cost_derivative(activations[-1], y)
         # 3.使用BP2求出delta(l),BP3求出偏置的梯度分量和BP4求出权重分量      
         nabla_b[-1] = delta
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
