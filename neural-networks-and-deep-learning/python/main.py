@@ -7,16 +7,42 @@ import mnist_loader
 training_data, validation_data, test_data = \
 mnist_loader.load_data_wrapper()
 
-# training_data = training_data[:10]
-# validation_data = validation_data[:10]
-# test_data = test_data[:10]    
+# cmd = 0
+def training_init():
+    """二次代价常规训练测试"""
+    import network
+    net = network.Network([784, 30, 10])
+    net.SGD(training_data, 30, 10, 3.0, test_data = test_data)
 
-# print len(training_data), len(validation_data), len(test_data)
+# cmd = 1
+def training_matrix():
+    """小批量训练采用矩阵向量形式"""
+    import network_training_matrix as network
+    net = network.Network([784, 30, 10])
+    # 每个小批量数据越多，矩阵向量反向传播的执行越快
+    # SGD_matrix执行反而更慢的原因是组装矩阵时将列表生成矩阵np.array([...])很耗时
+    net.SGD(training_data, 1, 5000, 3.0, test_data = None)
+    net.SGD_matrix(training_data, 1, 5000, 3.0, test_data = None)
 
-import network
+    net.SGD(training_data, 1, 10000, 3.0, test_data = None)
+    net.SGD_matrix(training_data, 1, 10000, 3.0, test_data = None)
 
-# 设置神经网络层数和每层的节点数，这里首层和尾层的节点数只能是784和10
-net = network.Network([784, 30, 10])
+# cmd = 2
+def training_cross_entropy():
+    """交叉熵训练测试，使用100个神经元提高了精度"""    
+    import network_cross_entropy as network
+    net = network.Network([784, 100, 10], cost=network.CrossEntropyCost)
+    net.large_weight_initializer()
+    net.SGD(training_data, 30, 10, 0.5, evaluation_data = test_data,
+    monitor_evaluation_accuracy=True)
 
-# 训练测试数据
-net.SGD(training_data, 30, 10, 3.0, test_data = test_data)
+# 主函数
+def main(cmd_num):
+    """主函数"""
+    main_list = (training_init, 
+                 training_matrix,
+                 training_cross_entropy)
+    main_list[cmd_num]()
+
+# 主函数
+main(0)
