@@ -1,6 +1,5 @@
 """network2.py
 ~~~~~~~~~~~~~~
-
 An improved version of network.py, implementing the stochastic
 gradient descent learning algorithm for a feedforward neural network.
 Improvements include the addition of the cross-entropy cost function,
@@ -8,7 +7,6 @@ regularization, and better initialization of network weights.  Note
 that I have focused on making the code simple, easily readable, and
 easily modifiable.  It is not optimized, and omits many desirable
 features.
-
 """
 
 #### Libraries
@@ -29,7 +27,6 @@ class QuadraticCost(object):
     def fn(a, y):
         """Return the cost associated with an output ``a`` and desired output
         ``y``.
-
         """
         return 0.5*np.linalg.norm(a-y)**2
 
@@ -49,7 +46,6 @@ class CrossEntropyCost(object):
         in the same slot, then the expression (1-y)*np.log(1-a)
         returns nan.  The np.nan_to_num ensures that that is converted
         to the correct value (0.0).
-
         """
         return np.sum(np.nan_to_num(-y*np.log(a)-(1-y)*np.log(1-a)))
 
@@ -59,7 +55,6 @@ class CrossEntropyCost(object):
         parameter ``z`` is not used by the method.  It is included in
         the method's parameters in order to make the interface
         consistent with the delta method for other cost classes.
-
         """
         return (a-y)
 
@@ -76,7 +71,6 @@ class Network(object):
         are initialized randomly, using
         ``self.default_weight_initializer`` (see docstring for that
         method).
-
         """
         self.num_layers = len(sizes)
         self.sizes = sizes
@@ -89,12 +83,10 @@ class Network(object):
         weights connecting to the same neuron.  Initialize the biases
         using a Gaussian distribution with mean 0 and standard
         deviation 1.
-
         Note that the first layer is assumed to be an input layer, and
         by convention we won't set any biases for those neurons, since
         biases are only ever used in computing the outputs from later
         layers.
-
         """
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [np.random.randn(y, x)/np.sqrt(x)
@@ -104,17 +96,14 @@ class Network(object):
         """Initialize the weights using a Gaussian distribution with mean 0
         and standard deviation 1.  Initialize the biases using a
         Gaussian distribution with mean 0 and standard deviation 1.
-
         Note that the first layer is assumed to be an input layer, and
         by convention we won't set any biases for those neurons, since
         biases are only ever used in computing the outputs from later
         layers.
-
         This weight and bias initializer uses the same approach as in
         Chapter 1, and is included for purposes of comparison.  It
         will usually be better to use the default weight initializer
         instead.
-
         """
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [np.random.randn(y, x)
@@ -150,7 +139,6 @@ class Network(object):
         will be a 30-element list containing the cost on the
         evaluation data at the end of each epoch. Note that the lists
         are empty if the corresponding flag is not set.
-
         """
         if evaluation_data: n_data = len(evaluation_data)
         n = len(training_data)
@@ -193,7 +181,6 @@ class Network(object):
         ``mini_batch`` is a list of tuples ``(x, y)``, ``eta`` is the
         learning rate, ``lmbda`` is the regularization parameter, and
         ``n`` is the total size of the training data set.
-
         """
         nabla_b = [np.zeros(b.shape) for b in self.biases]
         nabla_w = [np.zeros(w.shape) for w in self.weights]
@@ -245,7 +232,6 @@ class Network(object):
         network outputs the correct result. The neural network's
         output is assumed to be the index of whichever neuron in the
         final layer has the highest activation.
-
         The flag ``convert`` should be set to False if the data set is
         validation or test data (the usual case), and to True if the
         data set is the training data. The need for this flag arises
@@ -261,7 +247,6 @@ class Network(object):
         representations speeds things up.  More details on the
         representations can be found in
         mnist_loader.load_data_wrapper.
-
         """
         if convert:
             results = [(np.argmax(self.feedforward(x)), np.argmax(y))
@@ -301,7 +286,6 @@ class Network(object):
 def load(filename):
     """Load a neural network from the file ``filename``.  Returns an
     instance of Network.
-
     """
     f = open(filename, "r")
     data = json.load(f)
@@ -317,7 +301,6 @@ def vectorized_result(j):
     """Return a 10-dimensional unit vector with a 1.0 in the j'th position
     and zeroes elsewhere.  This is used to convert a digit (0...9)
     into a corresponding desired output from the neural network.
-
     """
     e = np.zeros((10, 1))
     e[j] = 1.0
