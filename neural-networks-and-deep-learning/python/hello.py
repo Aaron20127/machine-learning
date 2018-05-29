@@ -542,3 +542,4 @@ print '\n-----------'
 print np.linspace(0, 1, 10, endpoint=False)
 print np.linspace(0, 1, 10, endpoint=False).reshape(2,5)
 print np.ones((3,3)) * 0.5
+

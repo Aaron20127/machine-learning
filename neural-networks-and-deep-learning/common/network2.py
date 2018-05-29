@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: UTF8 -*-
+
 """network2.py
 ~~~~~~~~~~~~~~
 An improved version of network.py, implementing the stochastic
@@ -11,14 +14,17 @@ features.
 
 #### Libraries
 # Standard library
+import threading
 import json
 import random
 import sys
+sys.path.append("../common")
 
 # Third-party libraries
+import matplotlib.pyplot as plt
 import numpy as np
 
-
+import base_module as bml
 #### Define the quadratic and cross-entropy cost functions
 
 class QuadraticCost(object):
@@ -72,10 +78,32 @@ class Network(object):
         ``self.default_weight_initializer`` (see docstring for that
         method).
         """
+        # 画图数据初始化
+        self.figure_feature = {
+            "title" : {
+            },
+            "result" : [
+            ]
+        }     
+        
+        self.figure_feature["title"]["sizes"] = sizes
+
+        if cost == CrossEntropyCost:
+            self.figure_feature["title"]["cost"] = "CrossEntropyCost"
+        elif cost == QuadraticCost:
+            self.figure_feature["title"]["cost"] = "QuadraticCost"
+        else:
+            self.figure_feature["title"]["cost"] = ""    
+
+        # 私有数据初始化
         self.num_layers = len(sizes)
         self.sizes = sizes
-        self.default_weight_initializer()
         self.cost=cost
+        self.default_weight_initializer()
+        self.evaluation_cost = []
+        self.evaluation_accuracy = []
+        self.training_cost = []
+        self.training_accuracy = []
 
     def default_weight_initializer(self):
         """Initialize each weight using a Gaussian distribution with mean 0
@@ -91,6 +119,7 @@ class Network(object):
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [np.random.randn(y, x)/np.sqrt(x)
                         for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+        self.figure_feature["title"]["weight"] = "default"        
 
     def large_weight_initializer(self):
         """Initialize the weights using a Gaussian distribution with mean 0
@@ -108,6 +137,7 @@ class Network(object):
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+        self.figure_feature["title"]["weight"] = "large"
 
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
@@ -121,7 +151,10 @@ class Network(object):
             monitor_evaluation_cost=False,
             monitor_evaluation_accuracy=False,
             monitor_training_cost=False,
-            monitor_training_accuracy=False):
+            monitor_training_accuracy=False,
+            save_figure_feature_file_name = None,
+            B_plot_figure_feature = True,
+            B_show_figure_feature = False):
         """Train the neural network using mini-batch stochastic gradient
         descent.  The ``training_data`` is a list of tuples ``(x, y)``
         representing the training inputs and the desired outputs.  The
@@ -140,10 +173,16 @@ class Network(object):
         evaluation data at the end of each epoch. Note that the lists
         are empty if the corresponding flag is not set.
         """
+        self.figure_feature["title"]["training"] = len(training_data) 
+        self.figure_feature["title"]["evaluation"] = len(evaluation_data)         
+        self.figure_feature["title"]["epochs"] = epochs
+        self.figure_feature["title"]["batch_size"] = mini_batch_size
+        self.figure_feature["title"]["eta"] = eta
+        self.figure_feature["title"]["lmbda"] = lmbda
+
         if evaluation_data: n_data = len(evaluation_data)
         n = len(training_data)
-        evaluation_cost, evaluation_accuracy = [], []
-        training_cost, training_accuracy = [], []
+
         for j in xrange(epochs):
             random.shuffle(training_data)
             mini_batches = [
@@ -155,25 +194,152 @@ class Network(object):
             print "Epoch %s training complete" % j
             if monitor_training_cost:
                 cost = self.total_cost(training_data, lmbda)
-                training_cost.append(cost)
+                self.training_cost.append(cost)
                 print "Cost on training data: {}".format(cost)
             if monitor_training_accuracy:
                 accuracy = self.accuracy(training_data, convert=True)
-                training_accuracy.append(accuracy)
+                self.training_accuracy.append(accuracy * 1.0 / n)
                 print "Accuracy on training data: {} / {}".format(
                     accuracy, n)
             if monitor_evaluation_cost:
                 cost = self.total_cost(evaluation_data, lmbda, convert=True)
-                evaluation_cost.append(cost)
+                self.evaluation_cost.append(cost)
                 print "Cost on evaluation data: {}".format(cost)
             if monitor_evaluation_accuracy:
                 accuracy = self.accuracy(evaluation_data)
-                evaluation_accuracy.append(accuracy)
+                self.evaluation_accuracy.append(accuracy * 1.0 / n_data)
                 print "Accuracy on evaluation data: {} / {}".format(
                     self.accuracy(evaluation_data), n_data)
-            print
-        return evaluation_cost, evaluation_accuracy, \
-            training_cost, training_accuracy
+
+            print 
+        
+        # 保存运算结果
+        data_list = [
+            ["training_cost", self.training_cost, "cost"],
+            ["training_accuracy", self.training_accuracy, "accuracy"], 
+            ["evaluation_cost", self.evaluation_cost, "cost"], 
+            ["evaluation_accuracy", self.evaluation_accuracy, "accuracy"]]
+
+        result = self.figure_feature["result"] 
+        for i in range(len(data_list)):
+            data_obj = {}
+            if data_list[i][1]:
+                data_obj["name"] = data_list[i][0]                   
+                self.generate_result_parameter(data_obj, data_list[i][1]) 
+                data_obj["type"] = data_list[i][2]
+                result.append(data_obj)    
+
+        # 打印保存的数据
+        if B_show_figure_feature:
+            self.show_figure_feature()
+
+        # 保存数据
+        if save_figure_feature_file_name:
+            self.save_figure_feature(save_figure_feature_file_name)
+
+        # 画图
+        if B_plot_figure_feature:
+            self.plot_figure_feature()
+
+        return self.evaluation_cost, self.evaluation_accuracy, \
+            self.training_cost, self.training_accuracy
+
+    def show_figure_feature(self):
+        print json.dumps(self.figure_feature)
+
+    def generate_result_parameter(self, data_obj, data):
+        data_obj["data"] = data
+        data_obj["min"] = [data.index(min(data)), float('%.6f' % min(data))]
+        data_obj["max"] = [data.index(max(data)), float('%.6f' % max(data))]
+
+    def save_figure_feature(self, file):
+        bml.write_list_to_file(file, self.figure_feature)
+
+    def plot(self, y_coordinate, x_coordinate = [], line_lable = [], 
+             line_color = [], title = '', x_lable = '', y_lable = ''):
+        """
+        描述：画一幅坐标曲线图，可以同时有多条曲线
+        参数：y_coordinate （y坐标值，二元列表，例如[[1,2,3],[4,5,6]]，表示有两条曲线，每条曲线的y坐标为[1,2,3]和[4,5,6]）
+             x_coordinate  (x坐标值，同y坐标值，如果不提供x坐标值，则默认是从0开始增加的整数)
+             line_lable   （每条曲线代表的意义，就是曲线的名称，没有定义则使用默认的）
+             line_color    (曲线的颜色，一维列表，如果比曲线的条数少，则循环使用给定的颜色；不给定时，使用默认颜色；
+                            更多色彩查看 http://www.114la.com/other/rgb.htm)
+             title        （整个图片的名称）
+             x_lable      （x轴的含义）
+             y_lable       (y轴的含义)
+        """
+
+        if (len(x_coordinate) > 0) and \
+           (len(y_coordinate) != len(x_coordinate)):
+            print "error：x坐标和y坐标不匹配！"
+            return
+        
+        if (len(line_lable) > 0) and \
+           (len(y_coordinate) != len(line_lable)):
+            print "error：线条数和线条名称数不匹配，线条数%d，线条名称数%d！" % \
+                  (len(y_coordinate),len(line_lable))     
+            return
+
+        if 0 == len(line_color):
+            line_color = ['#9932CC', '#FFA933', '#FF4040', '#CDCD00',
+                          '#CD8500', '#C0FF3E', '#B8860B', '#AB82FF']
+            # print "info: 未指定色彩，使用默认颜色！"
+
+        if len(y_coordinate) > len(line_color):
+            print "warning: 指定颜色种类少于线条数，线条%d种，颜色%d种！" % \
+                  (len(y_coordinate),len(line_color))
+
+        plt.figure(figsize=(70, 35)) 
+        # ax = plt.subplot(221)
+        ax = plt.subplot(111)
+
+        # 如果没有给x的坐标，设置从0开始计数的整数坐标
+        if 0 == len(x_coordinate):
+            x_coordinate = [range(len(y)) for y in y_coordinate]
+
+        # 如果没有给线条名称，则使用默认线条名称
+        if 0 == len(line_lable):
+            line_lable = ["line " + str(i) for i in range(len(y_coordinate))]
+
+        for i in range(len(y_coordinate)):
+            ax.plot(x_coordinate[i], y_coordinate[i], color = line_color[i%len(line_color)], \
+                    linewidth = 2.0, label = line_lable[i])       
+
+        ax.set_title(title, fontsize=14) # 标题
+        ax.set_xlabel(x_lable, fontsize=14) # x坐标的意义
+        ax.set_ylabel(y_lable, fontsize=14) # y坐标的意义
+        ### 自适应轴的范围效果更好
+        # ax.set_xlim(self.get_min_and_max_in_list(x_coordinate)) # x坐标显示的宽度
+        # ax.set_ylim(self.get_min_and_max_in_list(y_coordinate)) # y坐标的宽度
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
+        plt.legend(loc="best", fontsize=14) # 线条的名称显示在右下角
+        plt.grid(True) # 网格
+        # plt.savefig("file.png", dpi = 200)  #保存图片，默认png     
+        # plt.show()
+
+    def plot_figure_base(self, feature):
+        "绘画基本图形"
+        result = feature["result"]
+        title = json.dumps(feature["title"])
+
+        for i in range(len(result)):
+            obj = result[i]
+            self.plot(y_coordinate = [obj["data"]],
+            line_lable = [obj["name"] + ", " + json.dumps(obj["min"]) + ", " + json.dumps(obj["max"])],
+            title = title,
+            x_lable = 'epoch',
+            y_lable = obj["type"])
+
+    def plot_figure_feature_from_file(self, file, data_type = "all"):
+        feature = bml.read_list_from_file(file)
+        self.plot_figure_base(feature)
+        plt.show()     
+
+    def plot_figure_feature(self, data_type = "all"):
+        "同时画多个图片，data_type表示画哪些数据的图形"
+        self.plot_figure_base(self.figure_feature)
+        plt.show()
 
     def update_mini_batch(self, mini_batch, eta, lmbda, n):
         """Update the network's weights and biases by applying gradient
@@ -263,6 +429,7 @@ class Network(object):
         the validation or test data.  See comments on the similar (but
         reversed) convention for the ``accuracy`` method, above.
         """
+        # 交叉熵的L2规范化代价函数求代价
         cost = 0.0
         for x, y in data:
             a = self.feedforward(x)
@@ -313,3 +480,8 @@ def sigmoid(z):
 def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
+
+def plot_figure(file):
+    "从保存数据中画图"
+    net = Network([784, 100,10])
+    net.plot_figure_feature_from_file(file)

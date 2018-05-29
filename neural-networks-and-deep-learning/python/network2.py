@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: UTF8 -*-
+
 """network2.py
 ~~~~~~~~~~~~~~
 An improved version of network.py, implementing the stochastic
@@ -90,6 +93,21 @@ class Network(object):
         """
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [np.random.randn(y, x)/np.sqrt(x)
+                        for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+    
+    def default_weight_initializer_1(self):
+        """Initialize each weight using a Gaussian distribution with mean 0
+        and standard deviation 1 over the square root of the number of
+        weights connecting to the same neuron.  Initialize the biases
+        using a Gaussian distribution with mean 0 and standard
+        deviation 1.
+        Note that the first layer is assumed to be an input layer, and
+        by convention we won't set any biases for those neurons, since
+        biases are only ever used in computing the outputs from later
+        layers.
+        """
+        self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
+        self.weights = [np.random.randn(y, x)/np.sqrt(x*100)
                         for x, y in zip(self.sizes[:-1], self.sizes[1:])]
 
     def large_weight_initializer(self):
@@ -263,6 +281,7 @@ class Network(object):
         the validation or test data.  See comments on the similar (but
         reversed) convention for the ``accuracy`` method, above.
         """
+        # 交叉熵的L2规范化代价函数求代价
         cost = 0.0
         for x, y in data:
             a = self.feedforward(x)

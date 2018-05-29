@@ -37,22 +37,21 @@ def training_cross_entropy():
     monitor_evaluation_accuracy=True)
 
 # cmd = 3
-def training_weight_decay():
+def training_weight_decay(id):
     """规范化，权重衰减"""    
     import training_weight_decay as network
 
-    n = 2
-    if (n == 0):
+    if (id == 0):
         net = network.Network([784, 30, 10], cost=network.CrossEntropyCost)
         net.large_weight_initializer()
-        net.SGD(training_data[:1000], 10000, 10, 0.5, 
+        net.SGD(training_data[:1000], 400, 10, 0.5, 
                 evaluation_data = test_data,
                 lmbda = 0.1,
                 monitor_evaluation_cost=True,
                 monitor_evaluation_accuracy=True,
                 monitor_training_accuracy=True,
                 monitor_training_cost=True)
-    elif (n == 1):
+    elif (id == 1):
         net = network.Network([784, 30, 10], cost=network.CrossEntropyCost)
         net.large_weight_initializer()
         net.SGD(training_data, 30, 10, 0.5, 
@@ -62,7 +61,7 @@ def training_weight_decay():
                 monitor_evaluation_accuracy=True,
                 monitor_training_accuracy=True)
                 # monitor_training_cost=True)
-    elif (n == 2):
+    elif (id == 2):
         net = network.Network([784, 100, 10], cost=network.CrossEntropyCost)
         net.large_weight_initializer()
         net.SGD(training_data, 60, 10, 0.1, 
@@ -73,14 +72,50 @@ def training_weight_decay():
                 monitor_training_accuracy=True)
                 # monitor_training_cost=True)
 
+# cmd = 4
+def training_initial_weight_with_not_standard_Gaussian_distribution(id = 0):
+    """初始化权重为非标准正太分布，权重乘上1/sqrt(n)，年是该神经元对应权重的个数
+        偏置仍为标准正太分布。
+    """    
+    import training_weight_decay as network
+
+    if (id == 0):
+        # 初始化权重为标准正太分布
+        print '初始化权重为标准正太分布\n'
+        net = network.Network([784, 30, 10], cost=network.CrossEntropyCost)
+        net.large_weight_initializer()
+        net.SGD(training_data, 30, 10, 0.1, 
+                evaluation_data = validation_data,
+                lmbda = 5.0,
+                monitor_evaluation_accuracy=True)
+    elif (id == 1):
+        # 初始化权重为非标准正太分布
+        print '初始化权重为非标准正太分布\n'
+        net = network.Network([784, 30, 10], cost=network.CrossEntropyCost)
+        # net.large_weight_initializer()
+        net.SGD(training_data, 30, 10, 0.1,
+                evaluation_data = validation_data,
+                lmbda = 5.0,
+                monitor_evaluation_accuracy=True)
+    else:
+        print "Invalid cmd id:", id, ', please try again !'
+
 # 主函数
-def main(cmd_num):
+def main(cmd, id):
     """主函数"""
     main_list = (training_init, 
                  training_matrix,
                  training_cross_entropy,
-                 training_weight_decay)
-    main_list[cmd_num]()
+                 training_weight_decay,
+                 training_initial_weight_with_not_standard_Gaussian_distribution)
+    main_list[cmd](id)
 
 # 主函数
-main(3)
+# main(4, 1)
+
+import network2
+net = network2.Network([784, 30,10], cost=network2.CrossEntropyCost)
+net.SGD(training_data[:10000], 100, 3, 0.1,
+        evaluation_data = validation_data[:1000],
+        lmbda = 6,
+        monitor_evaluation_accuracy=True)

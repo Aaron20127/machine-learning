@@ -75,8 +75,8 @@ class plotTest:
 
         # 16进制RGB http://www.114la.com/other/rgb.htm
         # linewith 是线宽
-        # label 是线的名称
-        ax.plot(x_1, y_1, color='#FFA933', linewidth=2.0,
+        # label 是线的名称 9932CC FFA933 FF4040
+        ax.plot(x_1, y_1, color='#9932CC', linewidth=2.0,
                 label="line 1")
 
         ax.plot(x_2, y_2, color='#FF4040', linewidth=2.0,
