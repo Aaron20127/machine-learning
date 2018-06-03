@@ -111,10 +111,9 @@ def test_6():
                 B_show_figure_feature=False)
 
 # cmd = ["-p", "ea", "-f", "test_2.net", "test_3.net", "test_4.net", "test_5.net"]
-# cmd = ["-t", '4']
-cmd = ['-t', "1", "2", "3", "4", "5", "6", "-p", "ta", "ea", "-f", 
-        "test_1.net", "test_2.net", "test_3.net", "test_4.net", "test_5.net", "test_6.net"]
-# cmd = sys.argv[1:]
+# cmd = ['-t', "1", "2", "3", "4", "5", "6", "-p", "ta", "ea", "-f", 
+#         "test_1.net", "test_2.net", "test_3.net", "test_4.net", "test_5.net", "test_6.net"]
+cmd = sys.argv[1:]
 
 training_function = [0, test_1, test_2, test_3, test_4, test_5, test_6]
 

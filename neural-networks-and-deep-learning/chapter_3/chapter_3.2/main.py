@@ -122,8 +122,9 @@ def test_5():
                 B_show_figure_feature=False)
 
 
-cmd = ['-t', "0", "1", "2", "3", "4", "5"] 
-# cmd = sys.argv[1:]
+# cmd = ['-t', "0", "1", "2", "3", "4", "5"] 
+# cmd = ['-p', '0', 'ta', 'tc', 'ea', 'ec', '-f', 'test_0.net']
+cmd = sys.argv[1:]
 
 training_function = [test_0, test_1, test_2, test_3, test_4, test_5]
 
