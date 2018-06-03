@@ -1,2 +1,7 @@
 neural-networks-and-deep-learning/python/mnist_loader.pyc
 neural-networks-and-deep-learning/python/network.pyc
+neural-networks-and-deep-learning/common/mnist_loader.pyc
+neural-networks-and-deep-learning/common/base_module.pyc
+neural-networks-and-deep-learning/common/command_line.pyc
+neural-networks-and-deep-learning/common/network2.pyc
+neural-networks-and-deep-learning/common/plot_figure.pyc
