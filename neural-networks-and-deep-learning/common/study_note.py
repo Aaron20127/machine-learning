@@ -6,6 +6,7 @@ import threading
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import sys
 
 def h_print(string):
     print '\n--------------------------------------------'
@@ -162,3 +163,7 @@ class threadTest:
 # plotTest().test() 
 
 
+
+
+a = np.exp(800.0)
+print a

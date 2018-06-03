@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import base_module as bml
+import plot_figure
 #### Define the quadratic and cross-entropy cost functions
 
 class QuadraticCost(object):
@@ -142,6 +143,7 @@ class Network(object):
     def feedforward(self, a):
         """Return the output of the network if ``a`` is input."""
         for b, w in zip(self.biases, self.weights):
+            c = np.dot(w, a)
             a = sigmoid(np.dot(w, a)+b)
         return a
 
@@ -153,7 +155,7 @@ class Network(object):
             monitor_training_cost=False,
             monitor_training_accuracy=False,
             save_figure_feature_file_name = None,
-            B_plot_figure_feature = True,
+            B_plot_figure_feature = False,
             B_show_figure_feature = False):
         """Train the neural network using mini-batch stochastic gradient
         descent.  The ``training_data`` is a list of tuples ``(x, y)``
@@ -215,10 +217,10 @@ class Network(object):
         
         # 保存运算结果
         data_list = [
-            ["training_cost", self.training_cost, "cost"],
-            ["training_accuracy", self.training_accuracy, "accuracy"], 
-            ["evaluation_cost", self.evaluation_cost, "cost"], 
-            ["evaluation_accuracy", self.evaluation_accuracy, "accuracy"]]
+            ["training cost", self.training_cost],
+            ["training accuracy", self.training_accuracy], 
+            ["evaluation cost", self.evaluation_cost], 
+            ["evaluation accuracy", self.evaluation_accuracy]]
 
         result = self.figure_feature["result"] 
         for i in range(len(data_list)):
@@ -226,12 +228,11 @@ class Network(object):
             if data_list[i][1]:
                 data_obj["name"] = data_list[i][0]                   
                 self.generate_result_parameter(data_obj, data_list[i][1]) 
-                data_obj["type"] = data_list[i][2]
                 result.append(data_obj)    
 
         # 打印保存的数据
         if B_show_figure_feature:
-            self.show_figure_feature()
+            self.print_figure_feature()
 
         # 保存数据
         if save_figure_feature_file_name:
@@ -239,12 +240,15 @@ class Network(object):
 
         # 画图
         if B_plot_figure_feature:
-            self.plot_figure_feature()
+            plot_figure.plot_figure([self.figure_feature], 
+                ["training accuracy", 'training cost', 'evaluation accuracy', 'evaluation cost'])
 
         return self.evaluation_cost, self.evaluation_accuracy, \
             self.training_cost, self.training_accuracy
 
-    def show_figure_feature(self):
+    def print_figure_feature(self):
+        """打印训练数据
+        """
         print json.dumps(self.figure_feature)
 
     def generate_result_parameter(self, data_obj, data):
@@ -253,93 +257,9 @@ class Network(object):
         data_obj["max"] = [data.index(max(data)), float('%.6f' % max(data))]
 
     def save_figure_feature(self, file):
+        """保存训练数据到文件
+        """
         bml.write_list_to_file(file, self.figure_feature)
-
-    def plot(self, y_coordinate, x_coordinate = [], line_lable = [], 
-             line_color = [], title = '', x_lable = '', y_lable = ''):
-        """
-        描述：画一幅坐标曲线图，可以同时有多条曲线
-        参数：y_coordinate （y坐标值，二元列表，例如[[1,2,3],[4,5,6]]，表示有两条曲线，每条曲线的y坐标为[1,2,3]和[4,5,6]）
-             x_coordinate  (x坐标值，同y坐标值，如果不提供x坐标值，则默认是从0开始增加的整数)
-             line_lable   （每条曲线代表的意义，就是曲线的名称，没有定义则使用默认的）
-             line_color    (曲线的颜色，一维列表，如果比曲线的条数少，则循环使用给定的颜色；不给定时，使用默认颜色；
-                            更多色彩查看 http://www.114la.com/other/rgb.htm)
-             title        （整个图片的名称）
-             x_lable      （x轴的含义）
-             y_lable       (y轴的含义)
-        """
-
-        if (len(x_coordinate) > 0) and \
-           (len(y_coordinate) != len(x_coordinate)):
-            print "error：x坐标和y坐标不匹配！"
-            return
-        
-        if (len(line_lable) > 0) and \
-           (len(y_coordinate) != len(line_lable)):
-            print "error：线条数和线条名称数不匹配，线条数%d，线条名称数%d！" % \
-                  (len(y_coordinate),len(line_lable))     
-            return
-
-        if 0 == len(line_color):
-            line_color = ['#9932CC', '#FFA933', '#FF4040', '#CDCD00',
-                          '#CD8500', '#C0FF3E', '#B8860B', '#AB82FF']
-            # print "info: 未指定色彩，使用默认颜色！"
-
-        if len(y_coordinate) > len(line_color):
-            print "warning: 指定颜色种类少于线条数，线条%d种，颜色%d种！" % \
-                  (len(y_coordinate),len(line_color))
-
-        plt.figure(figsize=(70, 35)) 
-        # ax = plt.subplot(221)
-        ax = plt.subplot(111)
-
-        # 如果没有给x的坐标，设置从0开始计数的整数坐标
-        if 0 == len(x_coordinate):
-            x_coordinate = [range(len(y)) for y in y_coordinate]
-
-        # 如果没有给线条名称，则使用默认线条名称
-        if 0 == len(line_lable):
-            line_lable = ["line " + str(i) for i in range(len(y_coordinate))]
-
-        for i in range(len(y_coordinate)):
-            ax.plot(x_coordinate[i], y_coordinate[i], color = line_color[i%len(line_color)], \
-                    linewidth = 2.0, label = line_lable[i])       
-
-        ax.set_title(title, fontsize=14) # 标题
-        ax.set_xlabel(x_lable, fontsize=14) # x坐标的意义
-        ax.set_ylabel(y_lable, fontsize=14) # y坐标的意义
-        ### 自适应轴的范围效果更好
-        # ax.set_xlim(self.get_min_and_max_in_list(x_coordinate)) # x坐标显示的宽度
-        # ax.set_ylim(self.get_min_and_max_in_list(y_coordinate)) # y坐标的宽度
-        plt.xticks(fontsize=14)
-        plt.yticks(fontsize=14)
-        plt.legend(loc="best", fontsize=14) # 线条的名称显示在右下角
-        plt.grid(True) # 网格
-        # plt.savefig("file.png", dpi = 200)  #保存图片，默认png     
-        # plt.show()
-
-    def plot_figure_base(self, feature):
-        "绘画基本图形"
-        result = feature["result"]
-        title = json.dumps(feature["title"])
-
-        for i in range(len(result)):
-            obj = result[i]
-            self.plot(y_coordinate = [obj["data"]],
-            line_lable = [obj["name"] + ", " + json.dumps(obj["min"]) + ", " + json.dumps(obj["max"])],
-            title = title,
-            x_lable = 'epoch',
-            y_lable = obj["type"])
-
-    def plot_figure_feature_from_file(self, file, data_type = "all"):
-        feature = bml.read_list_from_file(file)
-        self.plot_figure_base(feature)
-        plt.show()     
-
-    def plot_figure_feature(self, data_type = "all"):
-        "同时画多个图片，data_type表示画哪些数据的图形"
-        self.plot_figure_base(self.figure_feature)
-        plt.show()
 
     def update_mini_batch(self, mini_batch, eta, lmbda, n):
         """Update the network's weights and biases by applying gradient
@@ -481,7 +401,3 @@ def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 
-def plot_figure(file):
-    "从保存数据中画图"
-    net = Network([784, 100,10])
-    net.plot_figure_feature_from_file(file)
