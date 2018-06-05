@@ -69,7 +69,7 @@ class CrossEntropyCost(object):
 #### Main Network class
 class Network(object):
 
-    def __init__(self, sizes, cost=CrossEntropyCost):
+    def __init__(self, sizes, cost=CrossEntropyCost, momentum = False):
         """The list ``sizes`` contains the number of neurons in the respective
         layers of the network.  For example, if the list was [2, 3, 1]
         then it would be a three-layer network, with the first layer
@@ -106,6 +106,13 @@ class Network(object):
         self.training_cost = []
         self.training_accuracy = []
 
+        self.monmentum = momentum
+        if momentum:
+            ### 增加momentum，vb，vw表示运动速度
+            self.vb = [np.zeros((y, 1)) for y in self.sizes[1:]]
+            self.vw = [np.zeros((y, x)) for x, y in zip(self.sizes[:-1], self.sizes[1:])]
+            self.u = 0.9 #摩擦系数
+
     def default_weight_initializer(self):
         """Initialize each weight using a Gaussian distribution with mean 0
         and standard deviation 1 over the square root of the number of
@@ -117,6 +124,7 @@ class Network(object):
         biases are only ever used in computing the outputs from later
         layers.
         """
+
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [np.random.randn(y, x)/np.sqrt(x)
                         for x, y in zip(self.sizes[:-1], self.sizes[1:])]
@@ -135,6 +143,7 @@ class Network(object):
         will usually be better to use the default weight initializer
         instead.
         """
+        
         self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(self.sizes[:-1], self.sizes[1:])]
@@ -274,10 +283,23 @@ class Network(object):
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
-        self.weights = [(1-eta*(lmbda/n))*w-(eta/len(mini_batch))*nw
-                        for w, nw in zip(self.weights, nabla_w)]
-        self.biases = [b-(eta/len(mini_batch))*nb
-                       for b, nb in zip(self.biases, nabla_b)]
+
+        if self.monmentum:
+            ### monmentum 梯度下降方法
+            self.vw = [self.u * vw - eta*(lmbda/n)*w-(eta/len(mini_batch))*nw
+                            for vw, w, nw in zip(self.vw, self.weights, nabla_w)]
+            self.vb = [self.u * vb - (eta/len(mini_batch))*nb
+                            for vb, nb in zip(self.vb, nabla_b)]
+
+            self.weights = [w + vw
+                            for w, vw in zip(self.weights, self.vw)]
+            self.biases  = [b + vb
+                            for b, vb in zip(self.biases, self.vb)]
+        else:
+            self.weights = [(1-eta*(lmbda/n))*w-(eta/len(mini_batch))*nw
+                            for w, nw in zip(self.weights, nabla_w)]
+            self.biases = [b-(eta/len(mini_batch))*nb
+                        for b, nb in zip(self.biases, nabla_b)]
 
     def backprop(self, x, y):
         """Return a tuple ``(nabla_b, nabla_w)`` representing the
