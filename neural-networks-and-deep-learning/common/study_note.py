@@ -7,6 +7,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
+import network2
 
 def h_print(string):
     print '\n--------------------------------------------'
@@ -157,13 +158,25 @@ class threadTest:
 
         print 'main thread end!'
 
+#### 使用静态变量
+class staticVariableTest:
 
+    def func(self):
+        """a[0]是静态变量，只有把数据保存在list中才可以保留变量的值
+        """
+        a = [0]
+        def funcn():
+            a[0] += 1
+            return a
+        return funcn
+
+    def test(self):
+        f = self.func()
+        print f()[0]
+        print f()[0]
+        print f()[0]
 
 # threadTest().test()
 # plotTest().test() 
+# staticVariableTest().test()
 
-
-
-
-a = np.exp(800.0)
-print a

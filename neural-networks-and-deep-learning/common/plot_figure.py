@@ -15,7 +15,8 @@ import base_module as bml
 
 
 def plot_base(y_coordinate, x_coordinate = [], line_lable = [], 
-            line_color = [], title = '', x_lable = '', y_lable = ''):
+            line_color = [], title = '', x_lable = '', y_lable = '',
+            x_limit = [], y_limit = []):
     """
     描述：画一幅坐标曲线图，可以同时有多条曲线
     参数：y_coordinate （y坐标值，二元列表，例如[[1,2,3],[4,5,6]]，表示有两条曲线，每条曲线的y坐标为[1,2,3]和[4,5,6]）
@@ -68,8 +69,9 @@ def plot_base(y_coordinate, x_coordinate = [], line_lable = [],
     ax.set_xlabel(x_lable, fontsize=14) # x坐标的意义
     ax.set_ylabel(y_lable, fontsize=14) # y坐标的意义
     ### 自适应轴的范围效果更好
-    # ax.set_xlim(self.get_min_and_max_in_list(x_coordinate)) # x坐标显示的宽度
-    # ax.set_ylim(self.get_min_and_max_in_list(y_coordinate)) # y坐标的宽度
+    if x_limit: ax.set_xlim(x_limit) # x坐标显示的范围
+    if y_limit: ax.set_ylim(y_limit) # y坐标显示范围
+    
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     plt.legend(loc="best", fontsize=14) # 线条的名称显示在右下角

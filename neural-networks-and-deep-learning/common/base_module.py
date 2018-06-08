@@ -1,8 +1,10 @@
 #!/usr/bin/python
 # -*- coding: UTF8 -*-
 
-
 import json
+import matplotlib.pyplot as plt
+import numpy as np
+import network2
 
 def write_list_to_file(file, list):
     """将一个列表或字典转换成json字符号串存储到文件中"""
