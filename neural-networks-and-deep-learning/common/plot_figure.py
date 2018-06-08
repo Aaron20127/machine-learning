@@ -8,6 +8,7 @@ import sys
 sys.path.append("../common")
 
 # Third-party libraries
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -78,6 +79,26 @@ def plot_base(y_coordinate, x_coordinate = [], line_lable = [],
     plt.grid(True) # 网格
     # plt.savefig("file.png", dpi = 200)  #保存图片，默认png     
     # plt.show()
+
+def plot_base_3d(x_coordinate, y_coordinate, z_function, title = '',
+            x_lable = '', y_lable = '', z_lable = '',
+            x_limit = [], y_limit = [], z_limit = []):
+
+    figure = plt.figure(figsize=(24, 12)) 
+    ax = Axes3D(figure)
+
+    #网格化数据
+    X, Y = np.meshgrid(x_coordinate, y_coordinate)
+    Z = z_function(X, Y)
+    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='rainbow')
+
+    ax.set_title(title, fontsize=14)
+    ax.set_xlabel(x_lable, fontsize=14) # x坐标的意义
+    ax.set_ylabel(y_lable, fontsize=14) # y坐标的意义
+    ax.set_zlabel(z_lable, fontsize=14) # z坐标的意义
+    if x_limit: ax.set_xlim(x_limit) # x坐标显示的范围
+    if y_limit: ax.set_ylim(y_limit) # y坐标显示的范围
+    if z_limit: ax.set_zlim(z_limit) # z坐标显示的范围
 
 def extract_feature(feature_list, type):
     """从保存数据中提取信息

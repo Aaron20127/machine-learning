@@ -9,6 +9,9 @@ import numpy as np
 import sys
 import network2
 
+
+from mpl_toolkits.mplot3d import Axes3D
+
 def h_print(string):
     print '\n--------------------------------------------'
     print string
@@ -66,38 +69,42 @@ class matrixTest(object):
 #### 画图测试 https://blog.csdn.net/qq_31192383/article/details/53977822
 class plotTest:
 
-    def plot_multiple_curve(self, y_coordinate, x_coordinate = [], line_lable = [], 
-             line_color = [], title = '', x_lable = '', y_lable = ''):
+    def plot_base(self, y_coordinate, x_coordinate = [], line_lable = [], 
+                line_color = [], title = '', x_lable = '', y_lable = '',
+                x_limit = [], y_limit = []):
         """
         描述：画一幅坐标曲线图，可以同时有多条曲线
         参数：y_coordinate （y坐标值，二元列表，例如[[1,2,3],[4,5,6]]，表示有两条曲线，每条曲线的y坐标为[1,2,3]和[4,5,6]）
-             x_coordinate  (x坐标值，同y坐标值，如果不提供x坐标值，则默认是从0开始增加的整数)
-             line_lable   （每条曲线代表的意义，就是曲线的名称，没有定义则使用默认的）
-             line_color    (曲线的颜色，一维列表，如果比曲线的条数少，则循环使用给定的颜色；不给定时，使用默认颜色；
+                x_coordinate  (x坐标值，同y坐标值，如果不提供x坐标值，则默认是从0开始增加的整数)
+                line_lable   （每条曲线代表的意义，就是曲线的名称，没有定义则使用默认的）
+                line_color    (曲线的颜色，一维列表，如果比曲线的条数少，则循环使用给定的颜色；不给定时，使用默认颜色；
                             更多色彩查看 http://www.114la.com/other/rgb.htm)
-             title        （整个图片的名称）
-             x_lable      （x轴的含义）
-             y_lable       (y轴的含义)
+                title        （整个图片的名称）
+                x_lable      （x轴的含义）
+                y_lable       (y轴的含义)
         """
-        if (len(x_coordinate) > 0) and \
-           (len(y_coordinate) != len(x_coordinate)):
+
+        if (len(x_coordinate) > 0) and (len(y_coordinate) != len(x_coordinate)):
             print "error：x坐标和y坐标不匹配！"
             return
         
-        if (len(line_lable) > 0) and \
-           (len(y_coordinate) != len(line_lable)):
+        if (len(line_lable) > 0) and  (len(y_coordinate) != len(line_lable)):
             print "error：线条数和线条名称数不匹配，线条数%d，线条名称数%d！" % \
-                  (len(y_coordinate),len(line_lable))     
+                    (len(y_coordinate),len(line_lable))     
             return
 
         if 0 == len(line_color):
             line_color = ['#9932CC', '#FFA933', '#FF4040', '#CDCD00',
-                          '#CD8500', '#C0FF3E', '#B8860B', '#AB82FF']
+                            '#CD8500', '#C0FF3E', '#B8860B', '#AB82FF']
             # print "info: 未指定色彩，使用默认颜色！"
 
         if len(y_coordinate) > len(line_color):
             print "warning: 指定颜色种类少于线条数，线条%d种，颜色%d种！" % \
-                  (len(y_coordinate),len(line_color))
+                    (len(y_coordinate),len(line_color))
+
+        plt.figure(figsize=(70, 35)) 
+        # ax = plt.subplot(221)
+        ax = plt.subplot(111)
 
         # 如果没有给x的坐标，设置从0开始计数的整数坐标
         if 0 == len(x_coordinate):
@@ -107,39 +114,59 @@ class plotTest:
         if 0 == len(line_lable):
             line_lable = ["line " + str(i) for i in range(len(y_coordinate))]
 
-        plt.figure(figsize=(70, 35)) 
-        ax = plt.subplot(111)
-
         for i in range(len(y_coordinate)):
             ax.plot(x_coordinate[i], y_coordinate[i], color = line_color[i%len(line_color)], \
-                    linewidth = 2.0, label = line_lable[i])    
+                    linewidth = 2.0, label = line_lable[i])       
 
         ax.set_title(title, fontsize=14) # 标题
         ax.set_xlabel(x_lable, fontsize=14) # x坐标的意义
         ax.set_ylabel(y_lable, fontsize=14) # y坐标的意义
-        # ax.set_xlim(self.get_min_and_max_in_list(x_coordinate)) # x坐标显示的宽度
-        # ax.set_ylim(self.get_min_and_max_in_list(y_coordinate)) # y坐标的宽度
+        ### 自适应轴的范围效果更好
+        if x_limit: ax.set_xlim(x_limit) # x坐标显示的范围
+        if y_limit: ax.set_ylim(y_limit) # y坐标显示范围
+        
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
         plt.legend(loc="best", fontsize=14) # 线条的名称显示在右下角
         plt.grid(True) # 网格
-    
+        # plt.savefig("file.png", dpi = 200)  #保存图片，默认png     
+        # plt.show()
+
+    def plot_base_3d(self, x_coordinate, y_coordinate, z_function, title = '',
+                x_lable = '', y_lable = '', z_lable = '',
+                x_limit = [], y_limit = [], z_limit = []):
+
+        figure = plt.figure(figsize=(24, 12)) 
+        ax = Axes3D(figure)
+
+        #网格化数据
+        X, Y = np.meshgrid(x_coordinate, y_coordinate)
+        Z = z_function(X, Y)
+        ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='rainbow')
+
+        ax.set_title(title, fontsize=14)
+        ax.set_xlabel(x_lable, fontsize=14) # x坐标的意义
+        ax.set_ylabel(y_lable, fontsize=14) # y坐标的意义
+        ax.set_zlabel(z_lable, fontsize=14) # z坐标的意义
+        if x_limit: ax.set_xlim(x_limit) # x坐标显示的范围
+        if y_limit: ax.set_ylim(y_limit) # y坐标显示的范围
+        if z_limit: ax.set_zlim(z_limit) # z坐标显示的范围
+
 
     def test(self):
-        self.plot_multiple_curve([[1,2,3],[6,5,6]],
+        self.plot_base([[1,2,3],[6,5,6]],
                   line_lable = ['feature 1', 'feature 2'],
                   line_color = ['#9932CC', '#FFA933'],
                   title = 'Classification',
                   x_lable = 'Epoch',
                   y_lable = 'accuracy') 
-        
-        self.plot_multiple_curve([[2,2,3],[6,5,4]],
-                line_lable = ['feature 1', 'feature 2'],
-                line_color = ['#9932CC', '#FFA933'],
-                title = 'Classification',
-                x_lable = 'Epoch',
-                y_lable = 'accuracy') 
 
+        def fun(x, y):
+            return np.sin(3*x) + np.cos(3*y)
+
+        self.plot_base_3d(np.arange(1, 10, 0.1), np.arange(1, 10, 0.1), fun,
+                    x_lable='X', y_lable='Y', z_lable='Z')
+        
         plt.show()
 
 
@@ -177,6 +204,7 @@ class staticVariableTest:
         print f()[0]
 
 # threadTest().test()
-# plotTest().test() 
+plotTest().test() 
 # staticVariableTest().test()
+
 
