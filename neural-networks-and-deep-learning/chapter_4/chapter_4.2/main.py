@@ -83,20 +83,20 @@ def test_1():
      
     plt.show()
 
-
-
 def test_2():
     """二维情况，有3层网络，输出层一个神经元，隐藏层n对神经元，每对两个神经元组成，即0-1被分成了1/n个区间,
     每个区间可以是凸起和凹下表示，则n越大则输出越近似一条连续的曲线。输出层为一个神经元。
     1.y在-1到1之间，x在0-1之间，中间分成若干区间，随机拟合函数 f(x) = 0.2 + 0.4*x*x + 0.3*x*np.sin(15*x) + 0.05*np.cos(50*x)
+    2.注意，最后是用输出层的输入z拟合的f(x)，并不是输出层最终的输出
     """
     # 拟合的函数
     def fitting_functions(x):
         # return random.uniform(-1,1) # 随机拟合函数
         return 0.2 + 0.4*x*x + 0.3*x*np.sin(15*x) + 0.05*np.cos(50*x)
 
-    # 画出n个对隐藏层神经元的加权输出
     def n_random_pair_hidden_neurons_out_put(n, fun):
+        """画出n个对隐藏层神经元的加权输出,fun是需要拟合的单输入和单输出的函数
+        """
         y = None
         x = None
 
@@ -124,5 +124,57 @@ def test_2():
 
     plt.show()
 
+
+
+
+def test_3():
+    """二维情况，有3层网络，输出层一个神经元，隐藏层n对神经元，每对两个神经元组成，即0-1被分成了1/n个区间,
+    每个区间可以是凸起和凹下表示，则n越大则输出越近似一条连续的曲线。输出层为一个神经元。
+    1.y在-1到1之间，x在0-1之间，中间分成若干区间，随机拟合函数 f(x) = 0.2 + 0.4*x*x + 0.3*x*np.sin(15*x) + 0.05*np.cos(50*x)
+    2.注意，最后是用输出层的输出拟合的f(x)，是输出层最终的输出
+    3.要让最终输出层的结果拟合f(x)，输出层的输入应该是sigmod的反函数r-sigmod()和f(x)的符合，即r-sigmod(f(x))
+    """
+    # sigmod 反函数
+    def reverse_sigmod(x):
+        return np.log(x/(1.0-x))
+
+    # 拟合的函数
+    def fitting_functions(x):
+        return reverse_sigmod(0.2 + 0.4*x*x + 0.3*x*np.sin(15*x) + 0.05*np.cos(50*x))
+
+    def n_last_layer_out_put(n, fun):
+        """画出最后一层的输出，fun是r-sigmod(f(x))，最终输出将是f(x)
+        """
+        y = None
+        x = None
+
+        for i in np.linspace(0, 1, n, endpoint=False):
+            s1 = i; s2 = i+1.0/n; 
+            h = fun(i) # 区间高度
+            x, y1 = pair_hidden_neurons_out_put(s1, s2, h)
+
+            if y == None:
+                y = y1
+            else:
+                y += y1
+
+        y = network2.sigmoid(y)
+
+        plot_figure.plot_base(
+            y_coordinate = [y],
+            x_coordinate= [x],
+            title='n = %d' % (n),
+            x_lable='X',
+            y_lable='Sigmod (z)',
+            x_limit = [min(x)-0.2, max(x)+0.2],
+            y_limit = [min(y)-0.2, max(y)+0.2]) 
+
+    for n in np.linspace(10, 300, 5, endpoint=False):
+        n_last_layer_out_put(n, fitting_functions)
+
+    plt.show()
+
 # test_1()
 test_2()
+# test_3()
+
