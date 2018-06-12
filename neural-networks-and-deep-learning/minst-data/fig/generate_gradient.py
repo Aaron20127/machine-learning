@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: UTF8 -*-
+
 """generate_gradient.py
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -41,7 +44,7 @@ def main():
     f = open("initial_gradient.json", "w")
     json.dump(abbreviated_gradient, f)
     f.close()
-    shutil.copy("initial_gradient.json", "../../js/initial_gradient.json")
+    # shutil.copy("initial_gradient.json", "../js/initial_gradient.json")
     training(td, net, epochs, "norms_during_training_2_layers.json")
     plot_training(
         epochs, "norms_during_training_2_layers.json", 2)
@@ -63,16 +66,16 @@ def main():
 
 def initial_norms(training_data, net):
     average_gradient = get_average_gradient(net, training_data)
-    norms = [list_norm(avg) for avg in average_gradient[:-1]]
+    norms = [list_norm(avg) for avg in average_gradient[:-1]] #只要前边两层
     print "Average gradient for the hidden layers: "+str(norms)
     
 def training(training_data, net, epochs, filename):
     norms = []
     for j in range(epochs):
-        average_gradient = get_average_gradient(net, training_data)
+        average_gradient = get_average_gradient(net, training_data) # 在当前权重和偏置的基础上计算梯度
         norms.append([list_norm(avg) for avg in average_gradient[:-1]])
         print "Epoch: %s" % j
-        net.SGD(training_data, 1, 1000, 0.1, lmbda=5.0)
+        net.SGD(training_data, 1, 1000, 0.1, lmbda=5.0) # 为了梯度计算准确，不使用minibatch
     f = open(filename, "w")
     json.dump(norms, f)
     f.close()
@@ -97,12 +100,13 @@ def plot_training(epochs, filename, num_layers):
     plt.legend(loc="upper right")
     fig_filename = "training_speed_%s_layers.png" % num_layers
     plt.savefig(fig_filename)
-    shutil.copy(fig_filename, "../../images/"+fig_filename)
+    # shutil.copy(fig_filename, "../images/")
     plt.show()
 
 def get_average_gradient(net, training_data):
     nabla_b_results = [net.backprop(x, y)[0] for x, y in training_data]
     gradient = list_sum(nabla_b_results)
+
     return [(np.reshape(g, len(g))/len(training_data)).tolist() 
             for g in gradient]
 
@@ -112,6 +116,7 @@ def zip_sum(a, b):
 def list_sum(l):
     return reduce(zip_sum, l)
 
+# 求向量的模
 def list_norm(l):
     return math.sqrt(sum([x*x for x in l]))
 

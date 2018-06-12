@@ -10,11 +10,9 @@ import network2
 import command_line
 import plot_figure
 
-# 读取50000训练数据，10000验证数据，10000测试数据
-training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
 
 # 测试函数
-def test_1():
+def test_0(training_data, validation_data, test_data):
         """使用eta=10， lmbda=1000，训练网络
         """
         name = sys._getframe().f_code.co_name
@@ -30,7 +28,7 @@ def test_1():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_2():
+def test_1(training_data, validation_data, test_data):
         """使用小样本快速的训练
         """
         name = sys._getframe().f_code.co_name
@@ -46,7 +44,7 @@ def test_2():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_3():
+def test_2(training_data, validation_data, test_data):
         """在test_2中使用小样本的基础上，改变参数，快速获得训练的趋势
         """
         name = sys._getframe().f_code.co_name
@@ -62,7 +60,7 @@ def test_3():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_4():
+def test_3(training_data, validation_data, test_data):
         """在test_3中使用小样本的基础上，改变参数，使eta=100，发现效果并不是很好
         """
         name = sys._getframe().f_code.co_name
@@ -78,7 +76,7 @@ def test_4():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_5():
+def test_4(training_data, validation_data, test_data):
         """在test_4中使用小样本的基础上，改变参数，使eta=1，发现效果变好
         """
         name = sys._getframe().f_code.co_name
@@ -94,7 +92,7 @@ def test_5():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_6():
+def test_5(training_data, validation_data, test_data):
         """在test_5中使用小样本的基础上，改变参数，使eta=1，加深神经网络效果更好
         """
         name = sys._getframe().f_code.co_name
@@ -110,13 +108,9 @@ def test_6():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-# cmd = ["-p", "ea", "-f", "test_2.net", "test_3.net", "test_4.net", "test_5.net"]
-# cmd = ['-t', "1", "2", "3", "4", "5", "6", "-p", "ta", "ea", "-f", 
-#         "test_1.net", "test_2.net", "test_3.net", "test_4.net", "test_5.net", "test_6.net"]
+
 cmd = sys.argv[1:]
-
-training_function = [0, test_1, test_2, test_3, test_4, test_5, test_6]
-
+training_function = [test_0, test_1, test_2, test_3, test_4, test_5]
 command_line.register_training_function(training_function)
 command_line.execute_command(cmd)
 

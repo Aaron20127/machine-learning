@@ -204,7 +204,5 @@ class staticVariableTest:
         print f()[0]
 
 # threadTest().test()
-plotTest().test() 
+# plotTest().test() 
 # staticVariableTest().test()
-
-

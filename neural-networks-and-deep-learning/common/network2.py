@@ -15,6 +15,7 @@ features.
 #### Libraries
 # Standard library
 import threading
+import math
 import json
 import random
 import sys
@@ -105,6 +106,11 @@ class Network(object):
         self.evaluation_accuracy = []
         self.training_cost = []
         self.training_accuracy = []
+
+        # 每一层偏置的梯度的模
+        self.bias_gradient_norms = [] 
+        for i in range(self.num_layers - 1):
+            self.bias_gradient_norms.append([])
 
         self.monmentum = momentum
         if momentum:
@@ -226,16 +232,31 @@ class Network(object):
         
         # 保存运算结果
         data_list = [
-            ["training cost", self.training_cost],
-            ["training accuracy", self.training_accuracy], 
-            ["evaluation cost", self.evaluation_cost], 
-            ["evaluation accuracy", self.evaluation_accuracy]]
+            ["training cost", self.training_cost, 'cost'],
+            ["training accuracy", self.training_accuracy, 'accuracy'], 
+            ["evaluation cost", self.evaluation_cost, 'cost'], 
+            ["evaluation accuracy", self.evaluation_accuracy, 'accuracy']
+        ]
+        
+        # 保存隐藏层偏置梯度的模
+        for i in range(len(self.bias_gradient_norms[:-1])):
+            data = ['hidden layer %s bias gradient' % (i+1),
+                     self.bias_gradient_norms[i],
+                    'bias gradient']
+            data_list.append(data)
+
+        # 保存输出层偏置梯度的模
+        data = ['output layer bias gradient', 
+                 self.bias_gradient_norms[-1],
+                'bias gradient']
+        data_list.append(data)
 
         result = self.figure_feature["result"] 
         for i in range(len(data_list)):
             data_obj = {}
             if data_list[i][1]:
-                data_obj["name"] = data_list[i][0]                   
+                data_obj["name"] = data_list[i][0]    
+                data_obj["type"] = data_list[i][2]                
                 self.generate_result_parameter(data_obj, data_list[i][1]) 
                 result.append(data_obj)    
 
@@ -246,11 +267,6 @@ class Network(object):
         # 保存数据
         if save_figure_feature_file_name:
             self.save_figure_feature(save_figure_feature_file_name)
-
-        # 画图
-        if B_plot_figure_feature:
-            plot_figure.plot_figure([self.figure_feature], 
-                ["training accuracy", 'training cost', 'evaluation accuracy', 'evaluation cost'])
 
         return self.evaluation_cost, self.evaluation_accuracy, \
             self.training_cost, self.training_accuracy
@@ -283,6 +299,13 @@ class Network(object):
             delta_nabla_b, delta_nabla_w = self.backprop(x, y)
             nabla_b = [nb+dnb for nb, dnb in zip(nabla_b, delta_nabla_b)]
             nabla_w = [nw+dnw for nw, dnw in zip(nabla_w, delta_nabla_w)]
+
+        # 记录每次mini batch的偏置的平均梯度值，梯度值只记录隐藏层
+        b_average_gradient = [(np.reshape(nb, len(nb))/len(mini_batch)).tolist() for nb in nabla_b]
+        b_norms = [list_norm(avg) for avg in b_average_gradient]
+
+        for i in range(len(b_norms)):
+            self.bias_gradient_norms[i].append(b_norms[i])
 
         if self.monmentum:
             ### monmentum 梯度下降方法
@@ -423,3 +446,6 @@ def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
 
+# 求向量的模，向量由list表示
+def list_norm(l):
+    return math.sqrt(sum([x*x for x in l]))

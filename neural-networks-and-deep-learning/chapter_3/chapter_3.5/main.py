@@ -10,11 +10,8 @@ import network2
 import command_line
 import plot_figure
 
-# 读取50000训练数据，10000验证数据，10000测试数据
-training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
-
 # 测试函数
-def test_0():
+def test_0(training_data, validation_data, test_data):
         """eta = 0.025
         """
         name = sys._getframe().f_code.co_name
@@ -30,7 +27,7 @@ def test_0():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_1():
+def test_1(training_data, validation_data, test_data):
         """eta = 0.25
         """
         name = sys._getframe().f_code.co_name
@@ -46,7 +43,7 @@ def test_1():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_2():
+def test_2(training_data, validation_data, test_data):
         """eta = 2.5
         """
         name = sys._getframe().f_code.co_name
@@ -62,7 +59,7 @@ def test_2():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_3():
+def test_3(training_data, validation_data, test_data):
         """ momentum = False
         """
         name = sys._getframe().f_code.co_name
@@ -78,7 +75,7 @@ def test_3():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_4():
+def test_4(training_data, validation_data, test_data):
         """momentum = True, 梯度下降加速
         """
         name = sys._getframe().f_code.co_name

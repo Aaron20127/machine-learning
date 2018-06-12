@@ -122,37 +122,45 @@ def extract_feature(feature_list, type):
                 p_y_coordinate.append(obj["data"])
     return p_line_lable, p_y_coordinate, p_title    
 
-def plot_figure_base(feature_list, type_list):
+def plot_figure_base(feature_list, arg_list):
     "绘画基本图形"
-    for type in type_list:
-        p_y_lable =  type
-        p_x_lable = "epoch"
+    p_y_lable =  ''
+    p_x_lable = "epoch"
+    p_line_lable = []
+    p_y_coordinate = []
+    p_title = ''
 
-        p_line_lable, p_y_coordinate, p_title = extract_feature(feature_list, type)
+    for feature in feature_list:
+        p_title += json.dumps(feature["title"]) + '\n'
+        for obj in feature["result"]:
+            for arg in arg_list:
+                if obj["name"] == arg:
+                    line_lable = ''
+                    if len(feature_list) > 1:
+                        p_y_lable = arg
+                        line_lable = feature["title"]["file"] + ", " + json.dumps(obj["min"]) + \
+                                            ", " + json.dumps(obj["max"])
+                    else:
+                        p_y_lable = obj["type"]
+                        line_lable = arg + ", " + json.dumps(obj["min"]) + \
+                                            ", " + json.dumps(obj["max"])
+                        
+                    p_line_lable.append(line_lable)
+                    p_y_coordinate.append(obj["data"])
 
-        if p_y_coordinate:
-            plot_base(y_coordinate = p_y_coordinate,
-                        line_lable = p_line_lable,
-                        title = p_title,
-                        x_lable = p_x_lable,
-                        y_lable = p_y_lable)
-        else:
-            print "warning: no %s in file feature !" % type
+    if p_y_coordinate:
+        plot_base(y_coordinate = p_y_coordinate,
+                    line_lable = p_line_lable,
+                    title = p_title,
+                    x_lable = p_x_lable,
+                    y_lable = p_y_lable)
+    else:
+        print "warning: no %s in file feature !" % json.dumps(arg_list)
 
-def plot_figure_from_file(file_list, type_list):
-    """将多福图像的同一特征绘制在一幅图像中
+def plot_figure_from_feature_arg_list(feature_arg_list):
+    """绘制多个图片
     """
-    feature_list = []
-    for file in file_list:
-        feature = bml.read_list_from_file(file)
-        feature["title"]["file"] = file
-        feature_list.append(feature)
-
-    plot_figure_base(feature_list, type_list)
+    for feature_arg in feature_arg_list:
+        plot_figure_base(feature_arg[0], feature_arg[1])
     plt.show()
-
-def plot_figure(feature_list, type_list):
-    plot_figure_base(feature_list, type_list)
-    plt.show()
-
 

@@ -10,11 +10,9 @@ import network2
 import command_line
 import plot_figure
 
-# 读取50000训练数据，10000验证数据，10000测试数据
-training_data, validation_data, test_data = mnist_loader.load_data_wrapper()
 
 # 测试函数
-def test_0():
+def test_0(training_data, validation_data, test_data):
         """使用1/sqrt(n)初始化权重的方法
         """
         name = sys._getframe().f_code.co_name
@@ -30,7 +28,7 @@ def test_0():
                 B_plot_figure_feature=False,
                 B_show_figure_feature=False)
 
-def test_1():
+def test_1(training_data, validation_data, test_data):
         """使用标准正太分布初始化权重的方法
         """
         name = sys._getframe().f_code.co_name
@@ -48,17 +46,7 @@ def test_1():
                 B_show_figure_feature=False)
 
 
-# cmd = ['-t', "0", "1", "-p", "ta", "tc", "ea", "ec" "-f", "test_0.net", "test_1.net"]
 cmd = sys.argv[1:]
-
 training_function = [test_0, test_1]
-
 command_line.register_training_function(training_function)
 command_line.execute_command(cmd)
-
-
-
-
-
-
-
