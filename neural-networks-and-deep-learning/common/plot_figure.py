@@ -77,6 +77,9 @@ def plot_base(y_coordinate, x_coordinate = [], line_lable = [],
     plt.yticks(fontsize=14)
     plt.legend(loc="best", fontsize=14) # 线条的名称显示在右下角
     plt.grid(True) # 网格
+
+    # ax.set_yscale('linear') # 设置y轴为对数表示 
+    # ax.set_yscale('log') # 设置y轴为对数表示
     # plt.savefig("file.png", dpi = 200)  #保存图片，默认png     
     # plt.show()
 
