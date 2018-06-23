@@ -5,10 +5,13 @@ import time
 import threading
 import json
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import numpy as np
 import sys
 import network2
 
+import cPickle  
+import gzip
 
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -203,6 +206,128 @@ class staticVariableTest:
         print f()[0]
         print f()[0]
 
+#### 使用cPickle将图片保存成.plk文件，并将.plk文件作为图片输出
+class cPickleTest:
+
+    def test_1(self):
+        """将数据保成plk格式，并压缩成gz格式
+        """
+        a = np.array([[1,1],[2,2],[3,3]])
+        b = {4:5,6:7}  
+
+        #1. 不压缩直接保存成plk文件
+        f = open('tmp/a.plk', "w")
+        cPickle.dump((a, b), f, -1) # -1表示最优压缩
+        f.close()  
+        
+        # 读取从plk文件获取数据
+        f = open('tmp/a.plk', 'rb')
+        c, d = cPickle.load(f)  
+        f.close()  
+        print c, d 
+
+        #2. 压缩数据并保存成gz格式
+        f = gzip.open('tmp/a.plk.gz', "w")
+        cPickle.dump((a, b), f, -1)
+        f.close()  
+        
+        #读取从plk.gz文件获取数据
+        f = gzip.open('tmp/a.plk.gz', 'rb')
+        c, d = cPickle.load(f)  
+        f.close()  
+        print c, d 
+
+    def test_2(self):
+        """绘图的plt.imshow(img, cmap=None)的所有的cmap可选的值，即绘图的色域，
+           可用在test_3中
+        """
+        # Have colormaps separated into categories:
+        # http://matplotlib.org/examples/color/colormaps_reference.html
+        cmaps = [('Perceptually Uniform Sequential', [
+                    'viridis', 'plasma', 'inferno', 'magma']),
+                ('Sequential', [
+                    'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
+                    'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
+                    'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn']),
+                ('Sequential (2)', [
+                    'binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
+                    'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
+                    'hot', 'afmhot', 'gist_heat', 'copper']),
+                ('Diverging', [
+                    'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+                    'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr', 'seismic']),
+                ('Qualitative', [
+                    'Pastel1', 'Pastel2', 'Paired', 'Accent',
+                    'Dark2', 'Set1', 'Set2', 'Set3',
+                    'tab10', 'tab20', 'tab20b', 'tab20c']),
+                ('Miscellaneous', [
+                    'flag', 'prism', 'ocean', 'gist_earth', 'terrain', 'gist_stern',
+                    'gnuplot', 'gnuplot2', 'CMRmap', 'cubehelix', 'brg', 'hsv',
+                    'gist_rainbow', 'rainbow', 'jet', 'nipy_spectral', 'gist_ncar'])]
+
+        nrows = max(len(cmap_list) for cmap_category, cmap_list in cmaps)
+        gradient = np.linspace(0, 1, 256)
+        gradient = np.vstack((gradient, gradient))
+
+        def plot_color_gradients(cmap_category, cmap_list, nrows):
+            fig, axes = plt.subplots(nrows=nrows)
+            fig.subplots_adjust(top=0.95, bottom=0.01, left=0.2, right=0.99)
+            axes[0].set_title(cmap_category + ' colormaps', fontsize=14)
+
+            for ax, name in zip(axes, cmap_list):
+                ax.imshow(gradient, aspect='auto', cmap=plt.get_cmap(name))
+                pos = list(ax.get_position().bounds)
+                x_text = pos[0] - 0.01
+                y_text = pos[1] + pos[3]/2.
+                fig.text(x_text, y_text, name, va='center', ha='right', fontsize=10)
+
+            # Turn off *all* ticks & spines, not just the ones with colormaps.
+            for ax in axes:
+                ax.set_axis_off()
+
+        for cmap_category, cmap_list in cmaps:
+            plot_color_gradients(cmap_category, cmap_list, nrows)
+
+        plt.show()
+
+
+    def test_3(self):
+        """1.读取png图片，以不同色彩画出
+           2.绘制随机灰度图
+           3.绘制随机二值图
+        """
+        np.random.seed(19680801)
+        img=mpimg.imread('src/stinkbug.png', format='png')
+        print img
+
+        ### 火红色
+        plt.figure(figsize=(70, 35)) 
+        ax = plt.subplot(221)
+        ax.set_title('hot', fontsize=14)
+        plt.imshow(img, cmap='hot')
+
+        ### 灰色
+        ax = plt.subplot(222)
+        ax.set_title('Greys', fontsize=14)
+        plt.imshow(1-img, cmap='Greys')
+
+        ### 随机产生灰度图
+        img = np.random.random((28, 28)) # 返回[0.0, 0.1)之间的随机数数组
+        ax = plt.subplot(223)
+        ax.set_title('random grey', fontsize=14)
+        plt.imshow(img, cmap='Greys')
+
+        ### 二值图，灰色值只取0或1
+        img = np.random.randint(low=0, high=2, size = (28,28)) # 随机生成0-1之间的整数
+        ax = plt.subplot(224)
+        ax.set_title('random binary', fontsize=14)
+        plt.imshow(img, cmap='Greys')
+
+        plt.show()
+
+
+
+cPickleTest().test_3()
 # threadTest().test()
 # plotTest().test() 
 # staticVariableTest().test()
