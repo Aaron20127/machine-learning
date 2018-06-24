@@ -208,15 +208,27 @@ class plotTest:
             plot_color_gradients(cmap_category, cmap_list, nrows)
 
     def plot_picture(self, matrix, cmap, title=None):
-        """ 描述：将矩阵绘制成图片
-            matrix: 图片的二维矩阵
-            cmap: 色彩域
-            title：图片标题
+        """绘制矩阵图片
+           matrix 是列表，每个元素代表一个图片的像素矩阵
+           title  是列表，每个元素代表标题
+           cmap   是色彩
         """
+        def get_subplot_region_edge(num):
+            for i in range(10000):
+                if num <= i*i: 
+                    return i
+
+        total = len(matrix)
+        edge = get_subplot_region_edge(total)
         plt.figure(figsize=(70, 35)) 
-        ax = plt.subplot(111)
-        ax.set_title(title, fontsize=14)
-        plt.imshow(matrix, cmap=cmap)
+
+        for i in range(total):
+            ax = plt.subplot(edge, edge, i+1)  
+            if title:
+                ax.set_title(title[i], fontsize=14)
+            plt.imshow(matrix[i], cmap=cmap)
+            plt.xticks([]) # 关闭图片刻度，必须放在imshow之后才生效
+            plt.yticks([])
 
     def test(self):
         ### 1. 基本曲线图
@@ -247,20 +259,20 @@ class plotTest:
         # print img
 
         ### 火红色虫子
-        self.plot_picture(img, 'hot', 'hot')
+        self.plot_picture([img], 'hot', title=['hot'])
 
         ### 灰色虫子
-        self.plot_picture(1-img, 'Greys', 'Greys')
+        self.plot_picture([1-img], 'Greys', title=['Greys'])
 
         ### 随机产生灰度图
         img = np.random.random((28, 28)) # 返回[0.0, 0.1)之间的随机数数组
-        self.plot_picture(img, 'Greys', 'random Greys') 
+        self.plot_picture([img], 'Greys', title=['random Greys']) 
 
         ### 二值图，灰色值只取0或1
         img = np.random.randint(low=0, high=2, size = (28,28)) # 随机生成0-1之间的整数
-        self.plot_picture(img, 'binary', 'random binary') 
+        self.plot_picture([img], 'binary', title=['random binary']) 
 
-        print img
+        # print img
         plt.show()
 
 
@@ -330,24 +342,44 @@ class cPickleTest:
         f.close()  
         print c, d 
 
-    def test_3(self):
-        """1.读取png图片，以不同色彩画出
-           2.绘制随机灰度图
-           3.绘制随机二值图
-        """
 
+### 将mnistTest数据绘制成图片，并扩张数据集
+class mnistTest:
+    
+    def plot_mnist(self, start, stop, figure_count, \
+                    path = '../minst-data/data/mnist.pkl.gz'):
+        """描述：绘制mnsit数据成图片
+           start: 从第几福图开始
+           stop: 从第几福图结束
+           figure_count：总共由几个图显示
+           path: mnist路径
+        """
         #读取从plk.gz文件获取数据
-        f = gzip.open('../minst-data/data/mnist.pkl.gz', 'rb')
+        f = gzip.open(path, 'rb')
         traning_data, _, _ = cPickle.load(f)  
         f.close()  
 
-        plt.imshow(traning_data[0][0].reshape((28,28)), cmap='Greys')
+        total = stop - start + 1 # 画出第start到stop之间的图片
+        matrix = []
+        title = []
+
+        for i in range(total):
+            matrix.append(traning_data[0][start + i].reshape((28,28))) # 转换成图片原来的矩阵
+            title.append(traning_data[1][start + i])
+            if (i+1) % figure_count == 0:
+                plotTest().plot_picture(matrix, cmap='Greys', title = title)
+                matrix = []
+                title = []
+        
+        if matrix:
+            plotTest().plot_picture(matrix, cmap='Greys', title = title)
+
+        # plotTest().plot_picture([traning_data[0][0].reshape((28,28))], cmap='Greys', title = ['haha'])
 
         plt.show()
 
 
-
-cPickleTest().test_3()
+# cPickleTest().test_3()
 # threadTest().test()
-# plotTest().test() 
+mnistTest().plot_mnist(0, 19, 16) 
 # staticVariableTest().test()
