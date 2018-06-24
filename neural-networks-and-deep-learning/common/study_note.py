@@ -138,7 +138,8 @@ class plotTest:
     def plot_base_3d(self, x_coordinate, y_coordinate, z_function, title = '',
                 x_lable = '', y_lable = '', z_lable = '',
                 x_limit = [], y_limit = [], z_limit = []):
-
+        """绘制3D网格图
+        """
         figure = plt.figure(figsize=(24, 12)) 
         ax = Axes3D(figure)
 
@@ -154,90 +155,8 @@ class plotTest:
         if x_limit: ax.set_xlim(x_limit) # x坐标显示的范围
         if y_limit: ax.set_ylim(y_limit) # y坐标显示的范围
         if z_limit: ax.set_zlim(z_limit) # z坐标显示的范围
-
-
-    def test(self):
-        self.plot_base([[1,2,3],[6,5,6]],
-                  line_lable = ['feature 1', 'feature 2'],
-                  line_color = ['#9932CC', '#FFA933'],
-                  title = 'Classification',
-                  x_lable = 'Epoch',
-                  y_lable = 'accuracy') 
-
-        def fun(x, y):
-            return np.sin(3*x) + np.cos(3*y)
-
-        self.plot_base_3d(np.arange(1, 10, 0.1), np.arange(1, 10, 0.1), fun,
-                    x_lable='X', y_lable='Y', z_lable='Z')
-        
-        plt.show()
-
-
-#### 线程测试
-class threadTest:
-
-    def action(self, arg):
-        time.sleep(1)
-        print arg
-
-    def test(self):
-        for i in xrange(10):
-            arg = {"num" : i, "go" : "haha"}
-            t =threading.Thread(target=self.action,args=(arg,))
-            t.start()
-
-        print 'main thread end!'
-
-#### 使用静态变量
-class staticVariableTest:
-
-    def func(self):
-        """a[0]是静态变量，只有把数据保存在list中才可以保留变量的值
-        """
-        a = [0]
-        def funcn():
-            a[0] += 1
-            return a
-        return funcn
-
-    def test(self):
-        f = self.func()
-        print f()[0]
-        print f()[0]
-        print f()[0]
-
-#### 使用cPickle将图片保存成.plk文件，并将.plk文件作为图片输出
-class cPickleTest:
-
-    def test_1(self):
-        """将数据保成plk格式，并压缩成gz格式
-        """
-        a = np.array([[1,1],[2,2],[3,3]])
-        b = {4:5,6:7}  
-
-        #1. 不压缩直接保存成plk文件
-        f = open('tmp/a.plk', "w")
-        cPickle.dump((a, b), f, -1) # -1表示最优压缩
-        f.close()  
-        
-        # 读取从plk文件获取数据
-        f = open('tmp/a.plk', 'rb')
-        c, d = cPickle.load(f)  
-        f.close()  
-        print c, d 
-
-        #2. 压缩数据并保存成gz格式
-        f = gzip.open('tmp/a.plk.gz', "w")
-        cPickle.dump((a, b), f, -1)
-        f.close()  
-        
-        #读取从plk.gz文件获取数据
-        f = gzip.open('tmp/a.plk.gz', 'rb')
-        c, d = cPickle.load(f)  
-        f.close()  
-        print c, d 
-
-    def test_2(self):
+    
+    def picture_color_maps(self):
         """绘图的plt.imshow(img, cmap=None)的所有的cmap可选的值，即绘图的色域，
            可用在test_3中
         """
@@ -288,40 +207,141 @@ class cPickleTest:
         for cmap_category, cmap_list in cmaps:
             plot_color_gradients(cmap_category, cmap_list, nrows)
 
+    def plot_picture(self, matrix, cmap, title=None):
+        """ 描述：将矩阵绘制成图片
+            matrix: 图片的二维矩阵
+            cmap: 色彩域
+            title：图片标题
+        """
+        plt.figure(figsize=(70, 35)) 
+        ax = plt.subplot(111)
+        ax.set_title(title, fontsize=14)
+        plt.imshow(matrix, cmap=cmap)
+
+    def test(self):
+        ### 1. 基本曲线图
+        self.plot_base([[1,2,3],[6,5,6]],
+                  line_lable = ['feature 1', 'feature 2'],
+                  line_color = ['#9932CC', '#FFA933'],
+                  title = 'Classification',
+                  x_lable = 'Epoch',
+                  y_lable = 'accuracy') 
+
+        ### 2. 3D网格图
+        def fun(x, y):
+            return np.sin(3*x) + np.cos(3*y)
+
+        self.plot_base_3d(np.arange(1, 10, 0.1), np.arange(1, 10, 0.1), fun,
+                    x_lable='X', y_lable='Y', z_lable='Z')
+        
+        ### 3. 绘制图片的颜色域
+        self.picture_color_maps()
+
+        ### 4. 图片的读取和绘制
+        """读取png图片，以不同色彩画出
+           绘制随机灰度图
+           绘制随机二值图
+        """
+        np.random.seed(19680801)
+        img=mpimg.imread('src/stinkbug.png', format='png')
+        # print img
+
+        ### 火红色虫子
+        self.plot_picture(img, 'hot', 'hot')
+
+        ### 灰色虫子
+        self.plot_picture(1-img, 'Greys', 'Greys')
+
+        ### 随机产生灰度图
+        img = np.random.random((28, 28)) # 返回[0.0, 0.1)之间的随机数数组
+        self.plot_picture(img, 'Greys', 'random Greys') 
+
+        ### 二值图，灰色值只取0或1
+        img = np.random.randint(low=0, high=2, size = (28,28)) # 随机生成0-1之间的整数
+        self.plot_picture(img, 'binary', 'random binary') 
+
+        print img
         plt.show()
 
+
+#### 线程测试
+class threadTest:
+
+    def action(self, arg):
+        time.sleep(1)
+        print arg
+
+    def test(self):
+        for i in xrange(10):
+            arg = {"num" : i, "go" : "haha"}
+            t =threading.Thread(target=self.action,args=(arg,))
+            t.start()
+
+        print 'main thread end!'
+
+#### 使用静态变量
+class staticVariableTest:
+
+    def func(self):
+        """a[0]是静态变量，只有把数据保存在list中才可以保留变量的值
+        """
+        a = [0]
+        def funcn():
+            a[0] += 1
+            return a
+        return funcn
+
+    def test(self):
+        f = self.func()
+        print f()[0]
+        print f()[0]
+        print f()[0]
+
+
+#### 使用cPickle将图片保存成.plk文件，并将.plk文件作为图片输出
+#### 学习用plt.imshow()绘制图片
+class cPickleTest:
+
+    def test_1(self):
+        """将数据保成plk格式，并压缩成gz格式
+        """
+        a = np.array([[1,1],[2,2],[3,3]])
+        b = {4:5,6:7}  
+
+        #1. 不压缩直接保存成plk文件
+        f = open('tmp/a.plk', "w")
+        cPickle.dump((a, b), f, -1) # -1表示最优压缩
+        f.close()  
+        
+        # 读取从plk文件获取数据
+        f = open('tmp/a.plk', 'rb')
+        c, d = cPickle.load(f)  
+        f.close()  
+        print c, d 
+
+        #2. 压缩数据并保存成gz格式
+        f = gzip.open('tmp/a.plk.gz', "w")
+        cPickle.dump((a, b), f, -1)
+        f.close()  
+        
+        #读取从plk.gz文件获取数据
+        f = gzip.open('tmp/a.plk.gz', 'rb')
+        c, d = cPickle.load(f)  
+        f.close()  
+        print c, d 
 
     def test_3(self):
         """1.读取png图片，以不同色彩画出
            2.绘制随机灰度图
            3.绘制随机二值图
         """
-        np.random.seed(19680801)
-        img=mpimg.imread('src/stinkbug.png', format='png')
-        print img
 
-        ### 火红色
-        plt.figure(figsize=(70, 35)) 
-        ax = plt.subplot(221)
-        ax.set_title('hot', fontsize=14)
-        plt.imshow(img, cmap='hot')
+        #读取从plk.gz文件获取数据
+        f = gzip.open('../minst-data/data/mnist.pkl.gz', 'rb')
+        traning_data, _, _ = cPickle.load(f)  
+        f.close()  
 
-        ### 灰色
-        ax = plt.subplot(222)
-        ax.set_title('Greys', fontsize=14)
-        plt.imshow(1-img, cmap='Greys')
-
-        ### 随机产生灰度图
-        img = np.random.random((28, 28)) # 返回[0.0, 0.1)之间的随机数数组
-        ax = plt.subplot(223)
-        ax.set_title('random grey', fontsize=14)
-        plt.imshow(img, cmap='Greys')
-
-        ### 二值图，灰色值只取0或1
-        img = np.random.randint(low=0, high=2, size = (28,28)) # 随机生成0-1之间的整数
-        ax = plt.subplot(224)
-        ax.set_title('random binary', fontsize=14)
-        plt.imshow(img, cmap='Greys')
+        plt.imshow(traning_data[0][0].reshape((28,28)), cmap='Greys')
 
         plt.show()
 
