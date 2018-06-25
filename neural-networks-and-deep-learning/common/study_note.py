@@ -12,6 +12,8 @@ import network2
 
 import cPickle  
 import gzip
+import os.path
+import random
 
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -68,6 +70,22 @@ class matrixTest(object):
     def test_4(self):
         print self
         print self.__class__
+
+    def test_5(self):
+        """矩阵做平移操作
+        """
+        c = np.arange(9)
+        c = np.reshape(c, (3, 3))
+        print(c)
+        print '\n'
+        print np.roll(c, shift=1, axis=0) #矩阵下移一步
+        print '\n'
+        print np.roll(c, shift=-1, axis=0) #矩阵上移一步
+        print '\n'
+        print np.roll(c, shift=1, axis=1) #矩阵右移一步
+        print '\n'
+        print np.roll(c, shift=-1, axis=1) #矩阵左移一步
+    
 
 #### 画图测试 https://blog.csdn.net/qq_31192383/article/details/53977822
 class plotTest:
@@ -207,7 +225,7 @@ class plotTest:
         for cmap_category, cmap_list in cmaps:
             plot_color_gradients(cmap_category, cmap_list, nrows)
 
-    def plot_picture(self, matrix, cmap, title=None):
+    def plot_picture(self, matrix, cmap, title=None, axis=False):
         """绘制矩阵图片
            matrix 是列表，每个元素代表一个图片的像素矩阵
            title  是列表，每个元素代表标题
@@ -227,8 +245,9 @@ class plotTest:
             if title:
                 ax.set_title(title[i], fontsize=14)
             plt.imshow(matrix[i], cmap=cmap)
-            plt.xticks([]) # 关闭图片刻度，必须放在imshow之后才生效
-            plt.yticks([])
+            if not axis:
+                plt.xticks([]) # 关闭图片刻度，必须放在imshow之后才生效
+                plt.yticks([])
 
     def test(self):
         ### 1. 基本曲线图
@@ -346,8 +365,8 @@ class cPickleTest:
 ### 将mnistTest数据绘制成图片，并扩张数据集
 class mnistTest:
     
-    def plot_mnist(self, start, stop, figure_count, \
-                    path = '../minst-data/data/mnist.pkl.gz'):
+    def plot_mnist(self, start, stop, figure_count, axis=False,
+                   path='../minst-data/data/mnist.pkl.gz'):
         """描述：绘制mnsit数据成图片
            start: 从第几福图开始
            stop: 从第几福图结束
@@ -367,19 +386,71 @@ class mnistTest:
             matrix.append(traning_data[0][start + i].reshape((28,28))) # 转换成图片原来的矩阵
             title.append(traning_data[1][start + i])
             if (i+1) % figure_count == 0:
-                plotTest().plot_picture(matrix, cmap='Greys', title = title)
+                plotTest().plot_picture(matrix, cmap='Greys', title = title, axis = axis)
                 matrix = []
                 title = []
         
         if matrix:
-            plotTest().plot_picture(matrix, cmap='Greys', title = title)
-
-        # plotTest().plot_picture([traning_data[0][0].reshape((28,28))], cmap='Greys', title = ['haha'])
+            plotTest().plot_picture(matrix, cmap='Greys', title=title, axis=axis)
 
         plt.show()
+
+    def expand_mnist(self, start, stop,
+                     src_path='../minst-data/data/mnist.pkl.gz',
+                     dst_path='../minst-data/data/mnist_expanded.pkl.gz'
+                    ):
+        """扩展数据集，将数据集上下左右平移，生成4份扩展数据，共生成5份数据
+           start：从的第几个mnist数据开始扩展
+           stop：结束至几个数据
+           src_path: 源数据位置
+           dst_path: 保存数据位置
+        """
+        f = gzip.open(src_path, 'rb')
+        training_data, validation_data, test_data = cPickle.load(f)
+        f.close()
+
+        ## 选择扩展数数据范围
+        training_data = [training_data[0][start:(stop+1)],\
+                         training_data[1][start:(stop+1)]]
+
+        expanded_training_pairs = []
+        for x, y in zip(training_data[0], training_data[1]):
+            expanded_training_pairs.append((x, y))
+            image = np.reshape(x, (-1, 28))
+
+            for d, axis, index_position, index in [
+                    (1,  0, "first", 0), # 矩阵下移，将第一行置0
+                    (-1, 0, "first", 27), # 矩阵上移，将最后一行置0
+                    (1,  1, "last",  0), # 矩阵右移，将第一列置0
+                    (-1, 1, "last",  27)]: # 矩阵左移，将最后一列置0
+
+                #axis=0时，d>0下移,d<0上移。axis=1时，d>0右移，d<0左移
+                new_img = np.roll(image, d, axis)
+                if index_position == "first": 
+                    new_img[index, :] = np.zeros(28) # 将第n行换成0
+                else: 
+                    new_img[:, index] = np.zeros(28) # 将第n列换成0
+                expanded_training_pairs.append((np.reshape(new_img, 784), y))
+        # random.shuffle(expanded_training_pairs) # 随机打乱扩展数据
+        expanded_training_data = [list(d) for d in zip(*expanded_training_pairs)]
+        f = gzip.open(dst_path, "w")
+        cPickle.dump((expanded_training_data, validation_data, test_data), f)
+        f.close()
+        print("Saved expanded data, totle = %d " % (len(expanded_training_pairs)))
+
+    def test(self):
+        ###1.将mnist第0个数据扩展4份数据， 共5份数据保存在mnist_expanded.pkl.gz
+        self.expand_mnist(0, 0) # 扩展第一个数据
+        self.plot_mnist(0, 4, 9, axis=True, 
+                        path='../minst-data/data/mnist_expanded.pkl.gz') 
 
 
 # cPickleTest().test_3()
 # threadTest().test()
-mnistTest().plot_mnist(0, 19, 16) 
 # staticVariableTest().test()
+
+mnistTest().test()
+
+
+
+
