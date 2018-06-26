@@ -439,9 +439,9 @@ class mnistTest:
         print("Saved expanded data, totle = %d " % (len(expanded_training_pairs)))
 
     def test(self):
-        ###1.将mnist第0个数据扩展4份数据， 共5份数据保存在mnist_expanded.pkl.gz
-        self.expand_mnist(0, 0) # 扩展第一个数据
-        self.plot_mnist(0, 4, 9, axis=True, 
+        ###1.将mnist每个数据扩展4份数据， 共5份数据保存在mnist_expanded.pkl.gz
+        self.expand_mnist(0, 4) # 扩展第0-4个数据
+        self.plot_mnist(0, 24, 25, axis=True, 
                         path='../minst-data/data/mnist_expanded.pkl.gz') 
 
 
