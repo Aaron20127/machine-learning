@@ -86,7 +86,8 @@ def plot_base(y_coordinate, x_coordinate = [], line_lable = [],
 def plot_base_3d(x_coordinate, y_coordinate, z_function, title = '',
             x_lable = '', y_lable = '', z_lable = '',
             x_limit = [], y_limit = [], z_limit = []):
-
+    """绘制3D网格图
+    """
     figure = plt.figure(figsize=(24, 12)) 
     ax = Axes3D(figure)
 
@@ -102,6 +103,7 @@ def plot_base_3d(x_coordinate, y_coordinate, z_function, title = '',
     if x_limit: ax.set_xlim(x_limit) # x坐标显示的范围
     if y_limit: ax.set_ylim(y_limit) # y坐标显示的范围
     if z_limit: ax.set_zlim(z_limit) # z坐标显示的范围
+
 
 def extract_feature(feature_list, type):
     """从保存数据中提取信息
@@ -126,7 +128,7 @@ def extract_feature(feature_list, type):
     return p_line_lable, p_y_coordinate, p_title    
 
 def plot_figure_base(feature_list, arg_list):
-    "绘画基本图形"
+    "绘画二维线条"
     p_y_lable =  ''
     p_x_lable = "epoch"
     p_line_lable = []

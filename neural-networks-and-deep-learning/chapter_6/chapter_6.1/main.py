@@ -15,10 +15,11 @@ from network3 import ReLU
 
 # 扩展数据集
 import expand_mnist
+import study_note
 
 # 测试函数
 def test_0():
-    """全连接 + 全连接 + softmax, 测试准确率97:80%
+    """全连接 + 全连接u + softmax, 测试准确率97:80%
     """
     name = sys._getframe().f_code.co_name
     print name + "\n"
@@ -121,17 +122,21 @@ def test_5():
     """全连接 + 卷积层 + 最大值回合层 + 卷积层 + 最大值混合层 + 全连接 + softmax
        激活函数:修正线性单元
        代价函数：L2规范化
-       训练数据：使用扩展数据集
+       训练数据：使用扩展数据集，将数据集多扩张4倍
        测试准确率：99.44%
     """
     name = sys._getframe().f_code.co_name
     print name + "\n"
 
-    # 扩展数据集
-    expand_mnist.expand_mnist_data()
+    # 扩展数据集多扩展4倍
+    src_path='../../minst-data/data/mnist.pkl.gz'
+    dst_path='../../minst-data/data/mnist_expanded_4.pkl.gz'
+
+    study_note.mnistTest().expand_mnist(
+        src_path=src_path, dst_path=dst_path, expand_count=4) 
 
     training_data, validation_data, test_data = \
-        network3.load_data_shared("../../minst-data/data/mnist_expanded.pkl.gz")
+        network3.load_data_shared(dst_path)
     mini_batch_size = 10
 
     net = Network([
@@ -149,6 +154,114 @@ def test_5():
     net.SGD(training_data, 60, mini_batch_size, 0.03,
             validation_data, test_data, lmbda=0.1)
 
-test_5()
+def test_6():
+    """全连接 + 卷积层 + 最大值回合层 + 卷积层 + 最大值混合层 + 全连接 + softmax
+       激活函数:修正线性单元
+       代价函数：L2规范化
+       训练数据：使用扩展数据集，将数据集多扩张8倍
+       测试准确率：99.44%
+    """
+    name = sys._getframe().f_code.co_name
+    print name + "\n"
+
+    # 扩展数据集多扩展8倍
+    src_path='../../minst-data/data/mnist.pkl.gz'
+    dst_path='../../minst-data/data/mnist_expanded_8.pkl.gz'
+
+    study_note.mnistTest().expand_mnist(
+        src_path=src_path, dst_path=dst_path, expand_count=8) 
+
+    training_data, validation_data, test_data = \
+        network3.load_data_shared(dst_path)
+    mini_batch_size = 10
+
+    net = Network([
+                ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28),
+                                filter_shape=(20, 1, 5, 5),
+                                poolsize=(2, 2),
+                                activation_fn=ReLU),
+                ConvPoolLayer(image_shape=(mini_batch_size, 20, 12, 12),
+                                filter_shape=(40, 20, 5, 5),
+                                poolsize=(2, 2),
+                                activation_fn=ReLU),
+                FullyConnectedLayer(n_in=40*4*4, n_out=100, activation_fn=ReLU),
+                SoftmaxLayer(n_in=100, n_out=10)], mini_batch_size)
+                
+    net.SGD(training_data, 60, mini_batch_size, 0.03,
+            validation_data, test_data, lmbda=0.1)
+
+def test_7():
+    """全连接 + 卷积混合层 + 卷积混合层 + 全连接 + 全连接 + softmax
+       激活函数:修正线性单元
+       代价函数：L2规范化
+       训练数据：使用扩展数据集
+       测试准确率：
+    """
+    name = sys._getframe().f_code.co_name
+    print name + "\n"
+
+    # 扩展数据集
+    expand_mnist.expand_mnist_data()
+    dst_path="../../minst-data/data/mnist_expanded.pkl.gz"
+
+    training_data, validation_data, test_data = \
+        network3.load_data_shared(dst_path)
+    mini_batch_size = 10
+
+    net = Network([
+                    ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28),
+                                    filter_shape=(20, 1, 5, 5),
+                                    poolsize=(2, 2),
+                                    activation_fn=ReLU),
+                    ConvPoolLayer(image_shape=(mini_batch_size, 20, 12, 12),
+                                    filter_shape=(40, 20, 5, 5),
+                                    poolsize=(2, 2),
+                                    activation_fn=ReLU),
+                    FullyConnectedLayer(n_in=40*4*4, n_out=100, activation_fn=ReLU),
+                    FullyConnectedLayer(n_in=100, n_out=100, activation_fn=ReLU),
+                    SoftmaxLayer(n_in=100, n_out=10)], mini_batch_size)
+    net.SGD(training_data, 60, mini_batch_size, 0.03,
+            validation_data, test_data, lmbda=0.1)
+
+
+def test_8():
+    """全连接 + 卷积混合层 + 卷积混合层 + 全连接 + 全连接 + softmax
+       激活函数:修正线性单元
+       代价函数：L2规范化
+       训练数据：使用扩展数据集
+       规范化：  弃权
+       测试准确率：
+    """
+    name = sys._getframe().f_code.co_name
+    print name + "\n"
+
+    # 扩展数据集
+    expand_mnist.expand_mnist_data()
+    dst_path="../../minst-data/data/mnist_expanded.pkl.gz"
+
+    training_data, validation_data, test_data = \
+        network3.load_data_shared(dst_path)
+    mini_batch_size = 10
+
+    net = Network([
+                ConvPoolLayer(image_shape=(mini_batch_size, 1, 28, 28),
+                                filter_shape=(20, 1, 5, 5),
+                                poolsize=(2, 2),
+                                activation_fn=ReLU),
+                ConvPoolLayer(image_shape=(mini_batch_size, 20, 12, 12),
+                                filter_shape=(40, 20, 5, 5),
+                                poolsize=(2, 2),
+                                activation_fn=ReLU),
+                FullyConnectedLayer(
+                                n_in=40*4*4, n_out=1000, activation_fn=ReLU, p_dropout=0.5),
+                FullyConnectedLayer(
+                                n_in=1000, n_out=1000, activation_fn=ReLU, p_dropout=0.5),
+                SoftmaxLayer(n_in=1000, n_out=10, p_dropout=0.5)],
+                                mini_batch_size)
+    net.SGD(training_data, 40, mini_batch_size, 0.03,
+            validation_data, test_data)
+
+if __name__=="__main__":
+    test_8()
 
 

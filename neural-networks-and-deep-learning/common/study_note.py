@@ -370,7 +370,7 @@ class mnistTest:
         """描述：绘制mnsit数据成图片
            start: 从第几福图开始
            stop: 从第几福图结束
-           figure_count：总共由几个图显示
+           figure_count：每幅图显示count个图片
            path: mnist路径
         """
         #读取从plk.gz文件获取数据
@@ -381,6 +381,16 @@ class mnistTest:
         total = stop - start + 1 # 画出第start到stop之间的图片
         matrix = []
         title = []
+
+        if start > stop:
+            print 'Error: start shouldn\'t begger than stop'
+            sys.exit()      
+
+        if stop >= len(traning_data[0]) or \
+           total > len(traning_data[0]):
+            print 'Error: the max length of traning_data is %d ' \
+                    % (len(traning_data[0]))
+            sys.exit()
 
         for i in range(total):
             matrix.append(traning_data[0][start + i].reshape((28,28))) # 转换成图片原来的矩阵
@@ -395,38 +405,59 @@ class mnistTest:
 
         plt.show()
 
-    def expand_mnist(self, start, stop,
+    def expand_mnist(self, start=None, stop=None,
                      src_path='../minst-data/data/mnist.pkl.gz',
-                     dst_path='../minst-data/data/mnist_expanded.pkl.gz'
+                     dst_path='src/mnist_expanded.pkl.gz',
+                     expand_count=4
                     ):
         """扩展数据集，将数据集上下左右平移，生成4份扩展数据，共生成5份数据
            start：从的第几个mnist数据开始扩展
-           stop：结束至几个数据
+           stop：结束至几个数据, 如果start和stop都为None,或者其中一个为none,则扩展所有数据
            src_path: 源数据位置
            dst_path: 保存数据位置
+           expand_count: 单个数据扩展出多少份额外数据
         """
         f = gzip.open(src_path, 'rb')
         training_data, validation_data, test_data = cPickle.load(f)
         f.close()
+
+        ## 如果start和stop都为None,或者其中一个为none,则扩展所有数据
+        if start==None or stop==None:
+            start = 0
+            stop = len(training_data[0])-1
 
         ## 选择扩展数数据范围
         training_data = [training_data[0][start:(stop+1)],\
                          training_data[1][start:(stop+1)]]
 
         expanded_training_pairs = []
+
+        ## 数据扩展的方法
+        expanded_method_list = [
+            (1,  0, 0), # 矩阵下移一行，将第一行置0
+            (-1, 0, 27), # 矩阵上移，将最后一行置0
+            (1,  1, 0), # 矩阵右移，将第一列置0
+            (-1, 1, 27), # 矩阵左移，将最后一列置0
+
+            (2,  0, 1), # 矩阵下移2行，将第一行和第二行置0
+            (-2, 0, 26), # 矩阵上移2行，将最后两行置0
+            (2,  1, 1), # 矩阵右移2列，将前两列置0
+            (-2, 1, 26) # 矩阵左移2列，将最后两列置0
+        ]
+
+        if expand_count > len(expanded_method_list):
+            print 'Error: the max number of expand_count is %d ' \
+                   % (len(expanded_method_list))
+            sys.exit()
+
         for x, y in zip(training_data[0], training_data[1]):
             expanded_training_pairs.append((x, y))
             image = np.reshape(x, (-1, 28))
 
-            for d, axis, index_position, index in [
-                    (1,  0, "first", 0), # 矩阵下移，将第一行置0
-                    (-1, 0, "first", 27), # 矩阵上移，将最后一行置0
-                    (1,  1, "last",  0), # 矩阵右移，将第一列置0
-                    (-1, 1, "last",  27)]: # 矩阵左移，将最后一列置0
-
+            for d, axis, index in expanded_method_list[:expand_count]:
                 #axis=0时，d>0下移,d<0上移。axis=1时，d>0右移，d<0左移
                 new_img = np.roll(image, d, axis)
-                if index_position == "first": 
+                if axis == 0: 
                     new_img[index, :] = np.zeros(28) # 将第n行换成0
                 else: 
                     new_img[:, index] = np.zeros(28) # 将第n列换成0
@@ -439,18 +470,23 @@ class mnistTest:
         print("Saved expanded data, totle = %d " % (len(expanded_training_pairs)))
 
     def test(self):
-        ###1.将mnist每个数据扩展4份数据， 共5份数据保存在mnist_expanded.pkl.gz
-        self.expand_mnist(0, 4) # 扩展第0-4个数据
-        self.plot_mnist(0, 24, 25, axis=True, 
-                        path='../minst-data/data/mnist_expanded.pkl.gz') 
+
+        ###1.将mnist每个数据扩展expand_count份数据
+        src_path='../minst-data/data/mnist.pkl.gz'
+        dst_path='src/mnist_expanded.pkl.gz'
+
+        # self.expand_mnist(0, 0, src_path, dst_path, expand_count=8) 
+        self.plot_mnist(0, 8, 9, axis=True, path=dst_path) 
 
 
-# cPickleTest().test_3()
-# threadTest().test()
-# staticVariableTest().test()
 
-mnistTest().test()
 
+
+if __name__=="__main__":
+    mnistTest().test()
+    # cPickleTest().test_3()
+    # threadTest().test()
+    # staticVariableTest().test()
 
 
 
