@@ -19,7 +19,7 @@ import study_note
 
 # 测试函数
 def test_0():
-    """全连接 + 全连接u + softmax, 测试准确率97:80%
+    """全连接 + 全连接 + softmax, 测试准确率97:80%
     """
     name = sys._getframe().f_code.co_name
     print name + "\n"
@@ -34,7 +34,7 @@ def test_0():
                 validation_data, test_data)
 
 def test_1():
-    """全连接 + 卷积层 + 最大值混合层 + softmax，测试准确率98.48%
+    """全连接 + 卷积混合层 + softmax，测试准确率98.48%
     """
     name = sys._getframe().f_code.co_name
     print name + "\n"
@@ -51,7 +51,7 @@ def test_1():
                 validation_data, test_data)
 
 def test_2():
-    """全连接 + 卷积层 + 最大值回合层 + 全连接 + softmax，测试准确率98:78% 
+    """全连接 + 卷积混合层 + 全连接 + softmax，测试准确率98:78% 
     """
 
     name = sys._getframe().f_code.co_name
@@ -70,7 +70,7 @@ def test_2():
                 validation_data, test_data)
 
 def test_3():
-    """全连接 + 卷积层 + 最大值回合层 + 卷积层 + 最大值混合层 + 全连接 + softmax，测试准确率99.09%
+    """全连接 + 卷积混合层 + 卷积混合层 + 全连接 + softmax，测试准确率99.09%
     """
     name = sys._getframe().f_code.co_name
     print name + "\n"
@@ -91,7 +91,7 @@ def test_3():
                 validation_data, test_data)
 
 def test_4():
-    """全连接 + 卷积层 + 最大值回合层 + 卷积层 + 最大值混合层 + 全连接 + softmax
+    """全连接 + 卷积混合层 + 卷积混合层 + 全连接 + softmax
        激活函数:修正线性单元
        代价函数：L2规范化
        测试准确率：99.18%
@@ -119,7 +119,7 @@ def test_4():
             validation_data, test_data, lmbda=0.1)
 
 def test_5():
-    """全连接 + 卷积层 + 最大值回合层 + 卷积层 + 最大值混合层 + 全连接 + softmax
+    """全连接 + 卷积混合层 +  卷积混合层 + 全连接 + softmax
        激活函数:修正线性单元
        代价函数：L2规范化
        训练数据：使用扩展数据集，将数据集多扩张4倍
@@ -155,11 +155,11 @@ def test_5():
             validation_data, test_data, lmbda=0.1)
 
 def test_6():
-    """全连接 + 卷积层 + 最大值回合层 + 卷积层 + 最大值混合层 + 全连接 + softmax
+    """全连接 + 卷积混合层 + 卷积混合层 + 全连接 + softmax
        激活函数:修正线性单元
        代价函数：L2规范化
        训练数据：使用扩展数据集，将数据集多扩张8倍
-       测试准确率：99.44%
+       测试准确率：99.45%
     """
     name = sys._getframe().f_code.co_name
     print name + "\n"
@@ -195,7 +195,7 @@ def test_7():
        激活函数:修正线性单元
        代价函数：L2规范化
        训练数据：使用扩展数据集
-       测试准确率：
+       测试准确率：99.49%
     """
     name = sys._getframe().f_code.co_name
     print name + "\n"
@@ -230,7 +230,7 @@ def test_8():
        代价函数：L2规范化
        训练数据：使用扩展数据集
        规范化：  弃权
-       测试准确率：
+       测试准确率：99.57%
     """
     name = sys._getframe().f_code.co_name
     print name + "\n"
@@ -261,7 +261,6 @@ def test_8():
     net.SGD(training_data, 40, mini_batch_size, 0.03,
             validation_data, test_data)
 
+
 if __name__=="__main__":
-    test_8()
-
-
+    test_6()
