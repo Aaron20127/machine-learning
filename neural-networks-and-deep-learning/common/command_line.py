@@ -52,11 +52,16 @@ def plot(arg):
 
     # 从参数中获取名称和类型
     for ag in arg["arg"]:
-        for type in type_dict:
+        valide = False
+        for type in type_dict:      
             if ag == type[0]:
                 arg_list.append(type[1])
                 arg_type_list.append(type[2])
-    
+                valide = True
+        if not valide:
+            print "Error: Invalid parameter \'%s\' !" % (ag)
+            sys.exit()
+
     # 判断参数的类型，如果参数不是同一个类型则报错
     first_arg_type = arg_type_list[0]
     for arg_type in arg_type_list[1:]:
