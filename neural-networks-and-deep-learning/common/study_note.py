@@ -85,7 +85,56 @@ class matrixTest(object):
         print np.roll(c, shift=1, axis=1) #矩阵右移一步
         print '\n'
         print np.roll(c, shift=-1, axis=1) #矩阵左移一步
-    
+
+    def test_6(self):
+        """matrix和array的一些区别
+           参考连接：https://blog.csdn.net/vincentlipan/article/details/20717163
+        """
+        ### 1. mat可以有I,T,H属性，array只有转置属性
+        a = np.mat('1 0 0; 0 5 1; 0 0 1')
+        print '原矩阵:\n', a
+        print '转置：\n', a.T
+        print '逆矩阵:\n', a.I
+        print '基本数组:\n', a.A
+        print '原矩阵乘上逆矩阵：\n',a*a.I
+
+        # 共轭矩阵，存在虚数
+        a = np.mat([[1, 0+1j],[0, 0]])
+        print '\n原矩阵:\n', a
+        print '共轭矩阵：\n', a.H
+
+        # array只有转置属性
+        b = np.array([[1,1],[0,2]])
+        print '\n原矩阵:\n', b
+        print '转置：\n', b.T
+
+        c = np.mat(b) # 可以将np.array转换成matrix格式
+        print '\n原矩阵：\n', c
+        print '逆矩阵:\n', c.I  
+
+        ### 2.矩阵乘法不一样
+        a = np.array([[0, 1]])
+        b = a.transpose()
+        print '\narray中矩阵乘法:\n', np.dot(a, b)
+
+        a = np.mat(a)
+        b = np.mat(b)
+        print 'matrix中中矩阵乘法:\n', a*b
+
+        ### 3.同型矩阵对应元素相乘，好像只有array有这功能
+        a = np.array([[0, 2]])
+        print '\narray中同型矩阵对应元素相乘:\n', a*a
+
+        # a = np.mat(a)
+        # print 'matrix中同型矩阵对应元素相乘:\n', a.*a
+
+        ### 4.**2含义不同，array表示矩阵元素平方，matrix表示两个相同的矩阵相乘
+        a = np.array([[1, 2], [1, 2]])
+        print '\n原矩阵:\n', a
+        print 'array a**2:\n', a**2
+
+        a = np.mat(a)
+        print 'matrix a**2:\n', a**2
 
 #### 画图测试 https://blog.csdn.net/qq_31192383/article/details/53977822
 class plotTest:
@@ -485,10 +534,11 @@ class mnistTest:
 
 
 if __name__=="__main__":
-    mnistTest().test()
+    # mnistTest().test()
     # cPickleTest().test_3()
     # threadTest().test()
     # staticVariableTest().test()
+    matrixTest().test_6()
 
 
 
