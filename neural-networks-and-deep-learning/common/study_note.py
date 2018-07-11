@@ -136,6 +136,99 @@ class matrixTest(object):
         a = np.mat(a)
         print 'matrix a**2:\n', a**2
 
+#### 列表和数组的赋值，浅拷贝和深拷贝
+class copyTest:
+    """要复制数组和列表，则直接使用copy.deepcopy()达到深复制的效果，
+       copy.copy()只对数组有深复制的效果，列表是浅复制。
+    """
+
+    def test_1(self):
+        """对于列表直接赋值相当于引用
+        """
+        print "1.引用，未开辟新的空间，赋值后b受影响"
+        a = [1, 2, 3]
+        b = a
+        print 'b: ', b
+        a[0] = 4
+        print 'b: ', b
+
+    def test_2(self):
+        """列表有浅复制和深赋值方式，浅复制有两种方式，深复制使用deepcopy
+        """
+        print "\n2.浅复制只为列表的第一层开辟空间，若列表中还有列表则不会开辟空间，有两种浅复制方式"
+        # 1.浅复制使用a[:]
+        print "浅复制使用a[:]"
+        a1 = [1, [1]]
+        print 'a1: ', a1
+
+        b1 = a1[:]
+        a1[0] = 2
+        a1[1].append(2)
+
+        print 'a1: ', a1
+        print 'b1: ', b1
+
+        # 2.浅复制调用copy
+        print "\n浅复制调用copy"
+        import copy
+        a2 = [1, [1]]
+        print 'a2: ', a2
+
+        b2 = copy.copy(a2)
+        a2[0] = 2
+        a2[1].append(2)
+        print 'a2: ', a2
+        print 'b2: ', b2
+
+        # 3.深复制调用deepcopy
+        print "\n深复制调用deepcopy"
+        import copy
+        a3 = [1, [1]]
+        print 'a3: ', a3
+
+        b3 = copy.deepcopy(a3)
+        a3[0] = 2
+        a3[1].append(2)
+        print 'a3: ', a3
+        print 'b3: ', b3
+
+    def test_3(self):
+        """数组和列表一样，有浅复制和深赋值方式，浅复制一种，深复制使用copy,deepcopy
+        """
+        print "\n3.数组和列表一样，有浅复制和深赋值方式，浅复制一种，深复制使用copy,deepcopy"
+        # 1.浅复制使用a[:]
+        print "浅复制使用a[:]，对三维以上无用"
+        a1 = np.array([[[1]]]) # 三维数组
+        print 'a1: ', a1
+
+        b1 = a1[:]
+        a1[0][0][0] = 2
+
+        print 'a1: ', a1
+        print 'b1: ', b1
+
+        # 2.深复制调用copy
+        print "\n深复制调用copy"
+        import copy
+        a2 = np.array([[[1]]]) 
+        print 'a2: ', a2
+
+        b2 = copy.copy(a2)
+        a2[0][0][0] = 2
+        print 'a2: ', a2
+        print 'b2: ', b2
+
+        # 3.深复制调用deepcopy
+        print "\n深复制调用deepcopy"
+        import copy
+        a3 = np.array([[[1]]]) 
+        print 'a3: ', a3
+
+        b3 = copy.deepcopy(a3)
+        a3[0][0][0] = 2
+        print 'a3: ', a3
+        print 'b3: ', b3
+
 #### 画图测试 https://blog.csdn.net/qq_31192383/article/details/53977822
 class plotTest:
 
@@ -555,7 +648,6 @@ if __name__=="__main__":
     # threadTest().test()
     # staticVariableTest().test()
     # matrixTest().test_2()
-    plotTest().test()
-
-
+    # plotTest().test()
+    print
 
