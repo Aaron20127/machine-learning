@@ -318,7 +318,7 @@ class plotTest:
                 x_limit = [], y_limit = [], z_limit = []):
         """绘制3D网格图
         """
-        figure = plt.figure(figsize=(24, 12)) 
+        figure = plt.figure() 
         ax = Axes3D(figure)
 
         #网格化数据
@@ -398,7 +398,7 @@ class plotTest:
 
         total = len(matrix)
         edge = get_subplot_region_edge(total)
-        plt.figure(figsize=(70, 35)) 
+        plt.figure() 
 
         for i in range(total):
             ax = plt.subplot(edge, edge, i+1)  
@@ -437,15 +437,23 @@ class plotTest:
         img=mpimg.imread('src/stinkbug.png', format='png')
         # print img
 
+        """ 1.因为原图是灰度图，即二维图，没有RGBA颜色分配，所以默认分配的颜色为viridis，
+            每一个矩阵的值代表该颜色的深浅，所以给二维图分配不同的色彩可以得到不同颜色的效果图
+            2.若原图是彩色图，即三位图，则自动生成原色彩的图片，不会失真
+        """ 
+        ### 绿色虫子(默认cmap = viridis)
+        plt.figure()
+        plt.imshow(img)
+
         ### 火红色虫子
         self.plot_picture([img], 'hot', title=['hot'])
 
         ### 灰色虫子
-        self.plot_picture([1-img], 'Greys', title=['Greys'])
+        self.plot_picture([img], 'gray', title=['gray'])
 
         ### 随机产生灰度图
         img = np.random.random((28, 28)) # 返回[0.0, 0.1)之间的随机数数组
-        self.plot_picture([img], 'Greys', title=['random Greys']) 
+        self.plot_picture([img], 'gray', title=['random gray']) 
 
         ### 二值图，灰色值只取0或1
         img = np.random.randint(low=0, high=2, size = (28,28)) # 随机生成0-1之间的整数
@@ -638,7 +646,59 @@ class mnistTest:
         # self.expand_mnist(0, 0, src_path, dst_path, expand_count=8) 
         self.plot_mnist(0, 8, 9, axis=True, path=dst_path) 
 
+### 对png单个像素进行测试，主要是RBGA
+class imagShowTest:
+    """1.png格式图片的数组分二维和三维，三维格式为RGBA四个参数，最后一个参数是透明度
+       2.二维格式是没有颜色的，默认灰度图，一个像素只有一个数字表示颜色的深浅。
+         但是imshow可以指定二维图的颜色，且默认颜色是带绿色的viridis。若要绘制灰度图，
+         则cmap=gray。
+    """
+    def test(self):
+        plot_picture =  plotTest().plot_picture
 
+        ### 1.浮点数格式
+        # 单个像素RBGA，浮点数格式0-1，最后一位是透明度，不透明情况
+        img = np.array([[[0.23529412, 0.36862746, 0.6156863 , 1.]]])
+        plot_picture([img], cmap = 'gray', title = ['flaot32, a=1'])
+
+        # 单个像素RBGA，浮点数格式0-1，最后一位是透明度，半透明情况
+        img = np.array([[[0.23529412, 0.36862746, 0.6156863 , 0.5]]])
+        plot_picture([img], cmap = 'gray', title = ['flaot32, a=0.5'])
+
+        # 单个像素RBGA，浮点数格式0-1，最后一位是透明度，完全透明情况
+        img = np.array([[[0.23529412, 0.36862746, 0.6156863 , 0.0]]])
+        plot_picture([img], cmap = 'gray', title = ['flaot32, a=0.0'])
+
+        ### 2.8bit格式
+        # 单个像素RBGA，0-255，最后一位是透明度，不透明情况
+        img = np.array([[[47, 79, 79 , 255]]])
+        plot_picture([img], cmap = 'gray', title = ['uint8, a=255'])
+
+        # 单个像素RBGA，0-255，最后一位是透明度，半透明情况
+        img = np.array([[[47, 79, 79 , 128]]])
+        plot_picture([img], cmap = 'gray', title = ['uint8, a=128'])
+
+        # 单个像素RBGA，0-255，最后一位是透明度，完全透明情况
+        img = np.array([[[47, 79, 79 , 0]]])
+        plot_picture([img], cmap = 'gray', title = ['uint8, a=0.0'])
+
+        ### 3.单个二维像素，imshow默认是viridis，可以指定成灰度gray
+        # 1.一个像素只能是黑色
+        img = np.array([[0.9]])
+        plot_picture([img], cmap = 'gray', title = ['A pixel can only be black'])
+
+        # 2.两个像素只能是黑白
+        img = np.array([[0.4, 0.6]])
+        plot_picture([img], cmap = 'gray', title = ['Two pixels can only be black and white'])
+
+        # 2.3个像素以上才能有灰色
+        img = np.array([[0.1, 0.5, 0.9]])
+        plot_picture([img], cmap = 'gray', title = ['Gray can be seen above three pixels'])
+
+        img = np.array([[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]])
+        plot_picture([img], cmap = 'gray', title = ['Gray can be seen above three pixels'])
+
+        plt.show()
 
 
 
@@ -649,5 +709,5 @@ if __name__=="__main__":
     # staticVariableTest().test()
     # matrixTest().test_2()
     # plotTest().test()
-    print
+    imagShowTest().test()
 
