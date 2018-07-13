@@ -10,6 +10,7 @@ import numpy as np
 import sys
 import network2
 
+import math
 import cPickle  
 import gzip
 import os.path
@@ -701,6 +702,76 @@ class imagShowTest:
         plt.show()
 
 
+### 空间坐标旋转，欧拉角和四元组的测试
+### http://blog.miskcoo.com/2016/12/rotation-in-3d-space
+### https://blog.csdn.net/lql0716/article/details/72597719
+
+class eulerQuaternionsTest():
+
+    def Rx(self, theta):
+        """绕x轴旋转
+        """
+        cos = math.cos(theta)
+        sin = math.sin(theta)
+        return np.mat([[1,0,0],[0, cos, -sin],[0, sin, cos]])
+
+    def Ry(self, theta):
+        """绕y轴旋转
+        """
+        cos = math.cos(theta)
+        sin = math.sin(theta)
+        return np.mat([[cos,0,sin],[0, 1, 0],[-sin, 0, cos]])
+    
+    def Rz(self, theta):
+        """绕z轴旋转
+        """
+        cos = math.cos(theta)
+        sin = math.sin(theta)
+        return np.mat([[cos,-sin,0],[sin, cos, 0],[0, 0, 1]])
+
+    def rotate_around_any_axis(self, axis, theta, coordinate):
+        """绕任意轴旋转
+           axis：按照axis旋转的向量轴
+           theta：延轴旋转的角度
+           coordinate：需要被旋转的坐标
+           返回：旋转后的坐标
+        """
+
+    def test(self):
+
+        theta = math.pi / 2
+        a1 = np.mat([[1],[0],[0]])
+
+        # 每个轴旋转theta度的旋转矩阵
+        Rx = self.Rx(theta)
+        Ry = self.Ry(theta)
+        Rz = self.Rz(theta)
+
+        ### 1.单一变换，只按某个轴旋转
+        ax = Rx*a1
+        ay = Ry*a1
+        az = Rz*a1
+
+        print "1.分别绕xyz轴旋转做坐标变换"
+        print "原坐标:\n", a1
+        print "ax:\n",ax
+        print "ay:\n",ay
+        print "az:\n",az
+
+        ### 2.旋转矩阵的性质，R(-theta) = R(theta).I = R(theta).T
+        print "\n2.旋转矩阵的性质，以下矩阵值相同"
+        print "R(-theta):\n",self.Rx(-theta)
+        print "R(theta).I:\n",self.Rx(theta).I
+        print "R(theta).T:\n",self.Rx(theta).T
+
+        ### 3.不同的变换顺序导致结果不一样
+        print "\n3.组合变换，不同的变换顺序导致结果不一样"
+        print "原坐标:\n", a1
+        print "\n绕zyx顺序变换:\n", Rx*Ry*Rz*a1
+        print "\n绕zxy顺序变换:\n", Ry*Rx*Rz*a1
+        print "\n绕xyz顺序变换:\n", Rz*Ry*Rx*a1
+
+
 
 if __name__=="__main__":
     # mnistTest().test()
@@ -709,5 +780,6 @@ if __name__=="__main__":
     # staticVariableTest().test()
     # matrixTest().test_2()
     # plotTest().test()
-    imagShowTest().test()
+    # imagShowTest().test()
+    eulerQuaternionsTest().test()
 
