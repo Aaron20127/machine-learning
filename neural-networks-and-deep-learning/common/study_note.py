@@ -232,7 +232,6 @@ class copyTest:
 
 #### 画图测试 https://blog.csdn.net/qq_31192383/article/details/53977822
 class plotTest:
-
     def plot_base(self, y_coordinate, x_coordinate = [], line_lable = [], 
                 line_color = [], title = '', x_lable = '', y_lable = '',
                 x_limit = [], y_limit = [], y_scale = 'linear', p_type = [],
@@ -253,23 +252,23 @@ class plotTest:
                 grad          (网格)
         """
 
-        if (len(x_coordinate) > 0) and (len(y_coordinate) != len(x_coordinate)):
-            print "error：x坐标和y坐标不匹配！"
+        if (x_coordinate and (len(y_coordinate) != len(x_coordinate))):
+            print ("error：x坐标和y坐标不匹配！")
             sys.exit()
         
-        if (len(line_lable) > 0) and  (len(y_coordinate) != len(line_lable)):
-            print "error：线条数和线条名称数不匹配，线条数%d，线条名称数%d！" % \
-                    (len(y_coordinate),len(line_lable))     
+        if (line_lable and  (len(y_coordinate) != len(line_lable))):
+            print ("error：线条数和线条名称数不匹配，线条数%d，线条名称数%d！" % \
+                    (len(y_coordinate),len(line_lable)))     
             sys.exit()
 
-        if 0 == len(line_color):
+        if not line_color:
             line_color = ['#9932CC', '#FF4040' , '#FFA933', '#CDCD00',
                             '#CD8500', '#C0FF3E', '#B8860B', '#AB82FF']
             # print "info: 未指定色彩，使用默认颜色！"
 
         if len(y_coordinate) > len(line_color):
-            print "warning: 指定颜色种类少于线条数，线条%d种，颜色%d种！" % \
-                    (len(y_coordinate),len(line_color))
+            print ("warning: 指定颜色种类少于线条数，线条%d种，颜色%d种！" % \
+                    (len(y_coordinate),len(line_color)))
 
         # plt.figure(figsize=(70, 35)) 
         plt.figure() 
@@ -295,7 +294,7 @@ class plotTest:
                 ax.scatter(x_coordinate[i], y_coordinate[i],  s = 90, c=line_color[i%len(line_color)],\
                             linewidth = 2.0, alpha=0.6, marker='+', label = line_lable[i])
             else:
-                print "error：Invalid p_type %s！" % (p_type[i])
+                print ("error：Invalid p_type %s！" % (p_type[i]))
                 sys.exit()
 
         ax.set_title(title) # 标题
@@ -386,11 +385,11 @@ class plotTest:
         for cmap_category, cmap_list in cmaps:
             plot_color_gradients(cmap_category, cmap_list, nrows)
 
-    def plot_picture(self, matrix, cmap, title=None, axis=False):
+    def plot_picture(self, matrix, cmap=None, title=None, axis=True):
         """绘制矩阵图片
-           matrix 是列表，每个元素代表一个图片的像素矩阵
-           title  是列表，每个元素代表标题
-           cmap   是色彩
+            matrix 是列表，每个元素代表一个图片的像素矩阵
+            title  是列表，每个元素代表标题
+            cmap   是色彩
         """
         def get_subplot_region_edge(num):
             for i in range(10000):
@@ -405,7 +404,12 @@ class plotTest:
             ax = plt.subplot(edge, edge, i+1)  
             if title:
                 ax.set_title(title[i], fontsize=14)
-            plt.imshow(matrix[i], cmap=cmap)
+
+            if cmap:
+                plt.imshow(matrix[i], cmap=cmap)
+            else:
+                plt.imshow(matrix[i])
+
             if not axis:
                 plt.xticks([]) # 关闭图片刻度，必须放在imshow之后才生效
                 plt.yticks([])
@@ -771,6 +775,26 @@ class eulerQuaternionsTest():
         print "\n绕zxy顺序变换:\n", Ry*Rx*Rz*a1
         print "\n绕xyz顺序变换:\n", Rz*Ry*Rx*a1
 
+class polyfitTest:
+    """多项式拟合函数，相当于机器学习中的多项式线性回归
+       polyfit: 返回多项式系数数组，最前边的是高次项的系数
+       poly1d:直接根据系数数组返回多项式函数
+    """
+    def test(self):
+        x = np.array([0.0, 1.0, 2.0, 3.0,  4.0,  5.0])
+        y = np.array([0.0, 0.8, 0.9, 0.1, -0.8, -1.0])
+
+        #1. 3个系数，最高次数2次
+        z = np.polyfit(x, y, 3)
+        p3 = np.poly1d(z)
+
+        #2. 30个系数，最高次数29次
+        p30 = np.poly1d(np.polyfit(x, y, 30))
+
+        xp = np.linspace(-2, 6, 100)
+        _ = plt.plot(x, y, 'X', xp, p3(xp), '-', xp, p30(xp), '--')
+        plt.ylim(-2,2)
+        plt.show()
 
 
 if __name__=="__main__":
@@ -779,7 +803,9 @@ if __name__=="__main__":
     # threadTest().test()
     # staticVariableTest().test()
     # matrixTest().test_2()
-    # plotTest().test()
+    plotTest().test()
     # imagShowTest().test()
-    eulerQuaternionsTest().test()
+    # eulerQuaternionsTest().test()
+    # polyfitTest().test()
+
 
