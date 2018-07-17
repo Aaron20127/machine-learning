@@ -17,6 +17,7 @@ import os.path
 import random
 
 from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.animation as animation
 
 def h_print(string):
     print '\n--------------------------------------------'
@@ -781,8 +782,8 @@ class polyfitTest:
        poly1d:直接根据系数数组返回多项式函数
     """
     def test(self):
-        x = np.array([0.0, 1.0, 2.0, 3.0,  4.0,  5.0])
-        y = np.array([0.0, 0.8, 0.9, 0.1, -0.8, -1.0])
+        x = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0])
+        y = np.array([2.0, 4.0, 3.0, 5.0, 4.0, 6.0, 5.0])
 
         #1. 3个系数，最高次数2次
         z = np.polyfit(x, y, 3)
@@ -791,10 +792,69 @@ class polyfitTest:
         #2. 30个系数，最高次数29次
         p30 = np.poly1d(np.polyfit(x, y, 30))
 
-        xp = np.linspace(-2, 6, 100)
+        xp = np.linspace(-2, 7, 100)
         _ = plt.plot(x, y, 'X', xp, p3(xp), '-', xp, p30(xp), '--')
-        plt.ylim(-2,2)
+        plt.ylim(-2,20)
         plt.show()
+
+
+### 使用matplotlib进行动态画图测试
+### 参考连接：https://blog.csdn.net/liang890319/article/details/52063941
+class dynamicPlotTest:
+
+    def interactiveTest(self):
+        """可以在一个图上不停的画新的点，但是必须使用plt.pause对窗口进行刷新。
+        刷新一次执行一次plt画图操作
+        """
+        plt.ion() #交互式界面
+        for x in range(10):
+            y = np.random.random()
+            plt.scatter(x, y)
+            plt.pause(1) # 1秒刷新一次画图操作
+        
+        while True:
+            plt.pause(0.1) # 必须不停刷新窗口，不然窗口会消失
+
+    def animationTest(self):
+        """直接制作动画
+        """
+        pause = False
+
+        def simData():
+            t_max = 10.0
+            dt = 0.05
+            x = 0.0
+            t = 0.0
+            while t < t_max:
+                if not pause:
+                    x = np.sin(np.pi*t)
+                    t = t + dt
+                yield x, t
+        
+        def onClick(event):
+            global pause
+            pause ^= True
+    
+        def simPoints(simData):
+            x, t = simData[0], simData[1]
+            time_text.set_text(time_template%(t))
+            line.set_data(t, x)
+            return line, time_text
+    
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        line, = ax.plot([], [], 'bo', ms=10) # I'm still not clear on this stucture...
+        ax.set_ylim(-1, 1)
+        ax.set_xlim(0, 10)
+        
+        time_template = 'Time = %.1f s'    # prints running simulation time
+        time_text = ax.text(0.05, 0.9, '', transform=ax.transAxes)
+        fig.canvas.mpl_connect('button_press_event', onClick)
+        ani = animation.FuncAnimation(fig, simPoints, simData, blit=False, interval=10,
+            repeat=True)
+
+        plt.show()
+
 
 
 if __name__=="__main__":
@@ -803,9 +863,12 @@ if __name__=="__main__":
     # threadTest().test()
     # staticVariableTest().test()
     # matrixTest().test_2()
-    plotTest().test()
+    # plotTest().test()
     # imagShowTest().test()
     # eulerQuaternionsTest().test()
     # polyfitTest().test()
+    dynamicPlotTest().interactiveTest()
+    dynamicPlotTest().animationTest()
+
 
 
