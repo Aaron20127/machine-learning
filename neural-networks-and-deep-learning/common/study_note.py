@@ -14,6 +14,7 @@ import math
 import cPickle  
 import gzip
 import os.path
+import os
 import random
 
 from mpl_toolkits.mplot3d import Axes3D
@@ -855,7 +856,68 @@ class dynamicPlotTest:
 
         plt.show()
 
+### 对运行时的系统路径进行测试
+### https://blog.csdn.net/wangjianno2/article/details/48783127
+class osPathTest:
 
+    @staticmethod
+    def test():
+        #1.当前执行命令的目录
+        print("os.getcwd():")
+        cwd_path = os.getcwd()
+        print(cwd_path)
+
+        #2.获取绝对路径，如果给的目录是绝对路径形式，则返回不变，
+        #  如果给的是一个相对目录，则系统会添加一个当前的工作目录到前边
+        print("\nos.path.abspath():")
+        print(os.path.abspath('src'))
+        print(os.path.abspath('/src'))
+
+        #3.将路径的最后一个目录和前边的分开
+        print("\nos.path.split():")
+        print(os.path.split(cwd_path))
+
+        #4.得到去掉最末尾目录的路径
+        print("\nos.path.dirname():")
+        print(cwd_path)
+        print(os.path.dirname(cwd_path))
+
+        #5.得到末尾目录
+        print("\nos.path.basename():")
+        print(cwd_path)
+        print(os.path.basename(cwd_path))
+
+        #6.路径是否存在
+        print("\nos.path.exists():")
+        print(cwd_path)
+        print(os.path.exists(cwd_path))     
+
+        #7.是否是绝对路径
+        print("\nos.path.isabs():")
+        print(cwd_path)
+        print(os.path.isabs(cwd_path))   
+
+        #8.是否是一个文件
+        print("\nos.path.isfile():")
+        print(cwd_path)
+        print(os.path.isfile(cwd_path))         
+
+        #8.是否是一个目录   
+        print("\nos.path.isdir():")
+        print(cwd_path)
+        print(os.path.isdir(cwd_path)) 
+
+        #9.组合目录  
+        print("\nos.path.join():")
+        print(cwd_path)
+        print(os.path.join(cwd_path, 'src')) 
+
+        #10.添加模块路径
+        print("\nsys.path.append, sys.path.insert:")
+        sys.path.append("/test1")    #默认添加搜索路径到最后
+        sys.path.insert(0, "/test2") #添加到指定的优先级，此处是表示添加到最前边
+        sys.path.insert(2, "/test3") #添加到第三个位置
+        print(sys.path)
 
 if __name__=="__main__":
     # mnistTest().test()
@@ -867,8 +929,10 @@ if __name__=="__main__":
     # imagShowTest().test()
     # eulerQuaternionsTest().test()
     # polyfitTest().test()
-    dynamicPlotTest().interactiveTest()
-    dynamicPlotTest().animationTest()
+    # dynamicPlotTest().interactiveTest()
+    # dynamicPlotTest().animationTest()
+
+    osPathTest.test()
 
 
 
