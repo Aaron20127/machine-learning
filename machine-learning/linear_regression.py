@@ -4,7 +4,7 @@
 import sys
 import time
 
-sys.path.append("../neural-networks-and-deep-learning/common/")
+sys.path.append("neural-networks-and-deep-learning/common/")
 
 import study_note
 import numpy as np
@@ -59,8 +59,8 @@ class linear_regression(object):
             self.update_theta(alpha)
             cost = self.cost_fn()
             self.cost.append(cost)
-            print "epoch %d, cost %f" % (i, cost)
-        print "theta: \n", self.theta
+            print ("epoch %d, cost %f" % (i, cost))
+        print ("theta: \n", self.theta)
 
         return self.theta, self.cost
 
@@ -72,8 +72,8 @@ class linear_regression(object):
 
         cost = self.cost_fn()
         self.cost.append(cost)
-        print "cost: %f" % (cost)
-        print "theta: \n", self.theta
+        print ("cost: %f" % (cost))
+        print ("theta: \n", self.theta)
 
         return self.theta, self.cost
 
@@ -261,11 +261,14 @@ def quartic_polynomial_regression_test():
 
 if __name__=="__main__":
     ## 一元线性回归，欠拟合
-    multiple_linear_regression_test()
+    # multiple_linear_regression_test()
 
     ## 一元二阶多项式线性回归，拟合 
-    quadratic_polynomial_regression_test()
+    # quadratic_polynomial_regression_test()
 
     ## 一元四阶多项式线性回归，过拟合 
-    quartic_polynomial_regression_test()
+    # quartic_polynomial_regression_test()
+    print ("\n")
+    print (os.environ)
+    print ("\n")
         

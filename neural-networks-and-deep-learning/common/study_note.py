@@ -11,7 +11,7 @@ import sys
 import network2
 
 import math
-import cPickle  
+import pickle as cpickle #python3.5用的pickle代替cPickle
 import gzip
 import os.path
 import os
@@ -21,13 +21,13 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
 def h_print(string):
-    print '\n--------------------------------------------'
-    print string
-    print '--------------------------------------------'
+    print ('\n--------------------------------------------')
+    print (string)
+    print ('--------------------------------------------')
 
 def c_print(count):
-    print count
-    print '--------------------------------------------'
+    print (count)
+    print ('--------------------------------------------')
 
 
 #### matrix 矩阵的一些测试
@@ -71,8 +71,8 @@ class matrixTest(object):
         c_print (c)
 
     def test_4(self):
-        print self
-        print self.__class__
+        print (self)
+        print (self.__class__)
 
     def test_5(self):
         """矩阵做平移操作
@@ -80,14 +80,14 @@ class matrixTest(object):
         c = np.arange(9)
         c = np.reshape(c, (3, 3))
         print(c)
-        print '\n'
-        print np.roll(c, shift=1, axis=0) #矩阵下移一步
-        print '\n'
-        print np.roll(c, shift=-1, axis=0) #矩阵上移一步
-        print '\n'
-        print np.roll(c, shift=1, axis=1) #矩阵右移一步
-        print '\n'
-        print np.roll(c, shift=-1, axis=1) #矩阵左移一步
+        print ('\n')
+        print (np.roll)(c, shift=1, axis=0) #矩阵下移一步
+        print ('\n')
+        print (np.roll(c, shift=-1, axis=0)) #矩阵上移一步
+        print ('\n')
+        print (np.roll(c, shift=10, axis=1)) #矩阵右移一步
+        print ('\n')
+        print (np.roll(c, shift=-1, axis=1)) #矩阵左移一步
 
     def test_6(self):
         """matrix和array的一些区别
@@ -95,49 +95,49 @@ class matrixTest(object):
         """
         ### 1. mat可以有I,T,H属性，array只有转置属性
         a = np.mat('1 0 0; 0 5 1; 0 0 1')
-        print '原矩阵:\n', a
-        print '转置：\n', a.T
-        print '逆矩阵:\n', a.I
-        print '基本数组:\n', a.A
-        print '原矩阵乘上逆矩阵：\n',a*a.I
+        print ('原矩阵:\n', a)
+        print ('转置：\n', a.T)
+        print ('逆矩阵:\n', a.I)
+        print ('基本数组:\n', a.A)
+        print ('原矩阵乘上逆矩阵：\n',a*a.I)
 
         # 共轭矩阵，存在虚数
         a = np.mat([[1, 0+1j],[0, 0]])
-        print '\n原矩阵:\n', a
-        print '共轭矩阵：\n', a.H
+        print ('\n原矩阵:\n', a)
+        print ('共轭矩阵：\n', a.H)
 
         # array只有转置属性
         b = np.array([[1,1],[0,2]])
-        print '\n原矩阵:\n', b
-        print '转置：\n', b.T
+        print ('\n原矩阵:\n', b)
+        print ('转置：\n', b.T)
 
         c = np.mat(b) # 可以将np.array转换成matrix格式
-        print '\n原矩阵：\n', c
-        print '逆矩阵:\n', c.I  
+        print ('\n原矩阵：\n', c)
+        print ('逆矩阵:\n', c.I)  
 
         ### 2.矩阵乘法不一样
         a = np.array([[0, 1]])
         b = a.transpose()
-        print '\narray中矩阵乘法:\n', np.dot(a, b)
+        print ('\narray中矩阵乘法:\n', np.dot(a, b))
 
         a = np.mat(a)
         b = np.mat(b)
-        print 'matrix中中矩阵乘法:\n', a*b
+        print ('matrix中中矩阵乘法:\n', a*b)
 
         ### 3.同型矩阵对应元素相乘，好像只有array有这功能
         a = np.array([[0, 2]])
-        print '\narray中同型矩阵对应元素相乘:\n', a*a
+        print ('\narray中同型矩阵对应元素相乘:\n', a*a)
 
         # a = np.mat(a)
         # print 'matrix中同型矩阵对应元素相乘:\n', a.*a
 
         ### 4.**2含义不同，array表示矩阵元素平方，matrix表示两个相同的矩阵相乘
         a = np.array([[1, 2], [1, 2]])
-        print '\n原矩阵:\n', a
-        print 'array a**2:\n', a**2
+        print ('\n原矩阵:\n', a)
+        print ('array a**2:\n', a**2)
 
         a = np.mat(a)
-        print 'matrix a**2:\n', a**2
+        print ('matrix a**2:\n', a**2)
 
 #### 列表和数组的赋值，浅拷贝和深拷贝
 class copyTest:
@@ -148,89 +148,89 @@ class copyTest:
     def test_1(self):
         """对于列表直接赋值相当于引用
         """
-        print "1.引用，未开辟新的空间，赋值后b受影响"
+        print ("1.引用，未开辟新的空间，赋值后b受影响")
         a = [1, 2, 3]
         b = a
-        print 'b: ', b
+        print ('b: ', b)
         a[0] = 4
-        print 'b: ', b
+        print ('b: ', b)
 
     def test_2(self):
         """列表有浅复制和深赋值方式，浅复制有两种方式，深复制使用deepcopy
         """
-        print "\n2.浅复制只为列表的第一层开辟空间，若列表中还有列表则不会开辟空间，有两种浅复制方式"
+        print ("\n2.浅复制只为列表的第一层开辟空间，若列表中还有列表则不会开辟空间，有两种浅复制方式")
         # 1.浅复制使用a[:]
-        print "浅复制使用a[:]"
+        print ("浅复制使用a[:]")
         a1 = [1, [1]]
-        print 'a1: ', a1
+        print ('a1: ', a1)
 
         b1 = a1[:]
         a1[0] = 2
         a1[1].append(2)
 
-        print 'a1: ', a1
-        print 'b1: ', b1
+        print ('a1: ', a1)
+        print ('b1: ', b1)
 
         # 2.浅复制调用copy
-        print "\n浅复制调用copy"
+        print ("\n浅复制调用copy")
         import copy
         a2 = [1, [1]]
-        print 'a2: ', a2
+        print ('a2: ', a2)
 
         b2 = copy.copy(a2)
         a2[0] = 2
         a2[1].append(2)
-        print 'a2: ', a2
-        print 'b2: ', b2
+        print ('a2: ', a2)
+        print ('b2: ', b2)
 
         # 3.深复制调用deepcopy
-        print "\n深复制调用deepcopy"
+        print ("\n深复制调用deepcopy")
         import copy
         a3 = [1, [1]]
-        print 'a3: ', a3
+        print ('a3: ', a3)
 
         b3 = copy.deepcopy(a3)
         a3[0] = 2
         a3[1].append(2)
-        print 'a3: ', a3
-        print 'b3: ', b3
+        print ('a3: ', a3)
+        print ('b3: ', b3)
 
     def test_3(self):
         """数组和列表一样，有浅复制和深赋值方式，浅复制一种，深复制使用copy,deepcopy
         """
-        print "\n3.数组和列表一样，有浅复制和深赋值方式，浅复制一种，深复制使用copy,deepcopy"
+        print ("\n3.数组和列表一样，有浅复制和深赋值方式，浅复制一种，深复制使用copy,deepcopy")
         # 1.浅复制使用a[:]
-        print "浅复制使用a[:]，对三维以上无用"
+        print ("浅复制使用a[:]，对三维以上无用")
         a1 = np.array([[[1]]]) # 三维数组
-        print 'a1: ', a1
+        print ('a1: ', a1)
 
         b1 = a1[:]
         a1[0][0][0] = 2
 
-        print 'a1: ', a1
-        print 'b1: ', b1
+        print ('a1: ', a1)
+        print ('b1: ', b1)
 
         # 2.深复制调用copy
-        print "\n深复制调用copy"
+        print ("\n深复制调用copy")
         import copy
         a2 = np.array([[[1]]]) 
-        print 'a2: ', a2
+        print ('a2: ', a2)
 
         b2 = copy.copy(a2)
         a2[0][0][0] = 2
-        print 'a2: ', a2
-        print 'b2: ', b2
+        print ('a2: ', a2)
+        print ('b2: ', b2)
 
         # 3.深复制调用deepcopy
-        print "\n深复制调用deepcopy"
+        print ("\n深复制调用deepcopy")
         import copy
         a3 = np.array([[[1]]]) 
-        print 'a3: ', a3
+        print ('a3: ', a3)
 
         b3 = copy.deepcopy(a3)
         a3[0][0][0] = 2
-        print 'a3: ', a3
-        print 'b3: ', b3
+        print ('a3: ', a3)
+        print ('b3: ', b3)
 
 #### 画图测试 https://blog.csdn.net/qq_31192383/article/details/53977822
 class plotTest:
@@ -475,7 +475,7 @@ class threadTest:
 
     def action(self, arg):
         time.sleep(1)
-        print arg
+        print (arg)
 
     def test(self):
         for i in xrange(10):
@@ -483,7 +483,7 @@ class threadTest:
             t =threading.Thread(target=self.action,args=(arg,))
             t.start()
 
-        print 'main thread end!'
+        print ('main thread end!')
 
 #### 使用静态变量
 class staticVariableTest:
@@ -499,9 +499,9 @@ class staticVariableTest:
 
     def test(self):
         f = self.func()
-        print f()[0]
-        print f()[0]
-        print f()[0]
+        print (f()[0])
+        print (f()[0])
+        print (f()[0])
 
 
 #### 使用cPickle将图片保存成.plk文件，并将.plk文件作为图片输出
@@ -516,25 +516,25 @@ class cPickleTest:
 
         #1. 不压缩直接保存成plk文件
         f = open('tmp/a.plk', "w")
-        cPickle.dump((a, b), f, -1) # -1表示最优压缩
+        cpickle.dump((a, b), f, -1) # -1表示最优压缩
         f.close()  
         
         # 读取从plk文件获取数据
         f = open('tmp/a.plk', 'rb')
-        c, d = cPickle.load(f)  
+        c, d = cpickle.load(f)  
         f.close()  
-        print c, d 
+        print (c, d )
 
         #2. 压缩数据并保存成gz格式
         f = gzip.open('tmp/a.plk.gz', "w")
-        cPickle.dump((a, b), f, -1)
+        cpickle.dump((a, b), f, -1)
         f.close()  
         
         #读取从plk.gz文件获取数据
         f = gzip.open('tmp/a.plk.gz', 'rb')
-        c, d = cPickle.load(f)  
+        c, d = cpickle.load(f)  
         f.close()  
-        print c, d 
+        print (c, d )
 
 
 ### 将mnistTest数据绘制成图片，并扩张数据集
@@ -550,7 +550,7 @@ class mnistTest:
         """
         #读取从plk.gz文件获取数据
         f = gzip.open(path, 'rb')
-        traning_data, _, _ = cPickle.load(f)  
+        traning_data, _, _ = cpickle.load(f)  
         f.close()  
 
         total = stop - start + 1 # 画出第start到stop之间的图片
@@ -558,13 +558,13 @@ class mnistTest:
         title = []
 
         if start > stop:
-            print 'Error: start shouldn\'t begger than stop'
+            print ('Error: start shouldn\'t begger than stop')
             sys.exit()      
 
         if stop >= len(traning_data[0]) or \
            total > len(traning_data[0]):
-            print 'Error: the max length of traning_data is %d ' \
-                    % (len(traning_data[0]))
+            print ('Error: the max length of traning_data is %d ' \
+                    % (len(traning_data[0])))
             sys.exit()
 
         for i in range(total):
@@ -593,7 +593,7 @@ class mnistTest:
            expand_count: 单个数据扩展出多少份额外数据
         """
         f = gzip.open(src_path, 'rb')
-        training_data, validation_data, test_data = cPickle.load(f)
+        training_data, validation_data, test_data = cpickle.load(f)
         f.close()
 
         ## 如果start和stop都为None,或者其中一个为none,则扩展所有数据
@@ -621,8 +621,8 @@ class mnistTest:
         ]
 
         if expand_count > len(expanded_method_list):
-            print 'Error: the max number of expand_count is %d ' \
-                   % (len(expanded_method_list))
+            print ('Error: the max number of expand_count is %d ' \
+                   % (len(expanded_method_list)))
             sys.exit()
 
         for x, y in zip(training_data[0], training_data[1]):
@@ -640,7 +640,7 @@ class mnistTest:
         # random.shuffle(expanded_training_pairs) # 随机打乱扩展数据
         expanded_training_data = [list(d) for d in zip(*expanded_training_pairs)]
         f = gzip.open(dst_path, "w")
-        cPickle.dump((expanded_training_data, validation_data, test_data), f)
+        cpickle.dump((expanded_training_data, validation_data, test_data), f)
         f.close()
         print("Saved expanded data, totle = %d " % (len(expanded_training_pairs)))
 
@@ -758,24 +758,24 @@ class eulerQuaternionsTest():
         ay = Ry*a1
         az = Rz*a1
 
-        print "1.分别绕xyz轴旋转做坐标变换"
-        print "原坐标:\n", a1
-        print "ax:\n",ax
-        print "ay:\n",ay
-        print "az:\n",az
+        print ("1.分别绕xyz轴旋转做坐标变换")
+        print ("原坐标:\n", a1)
+        print ("ax:\n",ax)
+        print ("ay:\n",ay)
+        print ("az:\n",az)
 
         ### 2.旋转矩阵的性质，R(-theta) = R(theta).I = R(theta).T
-        print "\n2.旋转矩阵的性质，以下矩阵值相同"
-        print "R(-theta):\n",self.Rx(-theta)
-        print "R(theta).I:\n",self.Rx(theta).I
-        print "R(theta).T:\n",self.Rx(theta).T
+        print ("\n2.旋转矩阵的性质，以下矩阵值相同")
+        print ("R(-theta):\n",self.Rx(-theta))
+        print ("R(theta).I:\n",self.Rx(theta).I)
+        print ("R(theta).T:\n",self.Rx(theta).T)
 
         ### 3.不同的变换顺序导致结果不一样
-        print "\n3.组合变换，不同的变换顺序导致结果不一样"
-        print "原坐标:\n", a1
-        print "\n绕zyx顺序变换:\n", Rx*Ry*Rz*a1
-        print "\n绕zxy顺序变换:\n", Ry*Rx*Rz*a1
-        print "\n绕xyz顺序变换:\n", Rz*Ry*Rx*a1
+        print ("\n3.组合变换，不同的变换顺序导致结果不一样")
+        print ("原坐标:\n", a1)
+        print ("\n绕zyx顺序变换:\n", Rx*Ry*Rz*a1)
+        print ("\n绕zxy顺序变换:\n", Ry*Rx*Rz*a1)
+        print ("\n绕xyz顺序变换:\n", Rz*Ry*Rx*a1)
 
 class polyfitTest:
     """多项式拟合函数，相当于机器学习中的多项式线性回归
@@ -918,6 +918,8 @@ class osPathTest:
         sys.path.insert(0, "/test2") #添加到指定的优先级，此处是表示添加到最前边
         sys.path.insert(2, "/test3") #添加到第三个位置
         print(sys.path)
+
+        
 
 if __name__=="__main__":
     # mnistTest().test()

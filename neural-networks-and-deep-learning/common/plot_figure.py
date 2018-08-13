@@ -32,13 +32,13 @@ def plot_base(y_coordinate, x_coordinate = [], line_lable = [],
 
     if (len(x_coordinate) > 0) and \
         (len(y_coordinate) != len(x_coordinate)):
-        print "error：x坐标和y坐标不匹配！"
+        print ("error：x坐标和y坐标不匹配！")
         return
     
     if (len(line_lable) > 0) and \
         (len(y_coordinate) != len(line_lable)):
-        print "error：线条数和线条名称数不匹配，线条数%d，线条名称数%d！" % \
-                (len(y_coordinate),len(line_lable))     
+        print ("error：线条数和线条名称数不匹配，线条数%d，线条名称数%d！" % \
+                (len(y_coordinate),len(line_lable)))  
         return
 
     if 0 == len(line_color):
@@ -47,8 +47,8 @@ def plot_base(y_coordinate, x_coordinate = [], line_lable = [],
         # print "info: 未指定色彩，使用默认颜色！"
 
     if len(y_coordinate) > len(line_color):
-        print "warning: 指定颜色种类少于线条数，线条%d种，颜色%d种！" % \
-                (len(y_coordinate),len(line_color))
+        print ("warning: 指定颜色种类少于线条数，线条%d种，颜色%d种！" % \
+                (len(y_coordinate),len(line_color)))
 
     plt.figure(figsize=(70, 35)) 
     # ax = plt.subplot(221)
@@ -160,7 +160,7 @@ def plot_figure_base(feature_list, arg_list):
                     x_lable = p_x_lable,
                     y_lable = p_y_lable)
     else:
-        print "warning: no %s in file feature !" % json.dumps(arg_list)
+        print ("warning: no %s in file feature !" % json.dumps(arg_list))
 
 def plot_figure_from_feature_arg_list(feature_arg_list):
     """绘制多个图片
