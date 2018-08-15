@@ -11,6 +11,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+class standard_equation_method:
+    """标准方程法求解线性回归
+    """
+    def solve_equation(self, x, y):
+        """解方程
+        """
+        theta = (x.T * x).I * x.T * y
+        return theta
+
+    def test(self):
+        x = np.mat([[1,2,3], [3,2,1], [4,0,100], [7,100,10]])
+        y = np.mat([[1],[2],[3],[4]])
+        theta = self.solve_equation(x, y)
+        print ('theta:\n', theta)
+
 """
     线性回归分类：
         1.单元线性回归（一个训练数据一个特征）
@@ -260,6 +275,9 @@ def quartic_polynomial_regression_test():
     plt.show()
 
 if __name__=="__main__":
+    #标准方程法求解
+    standard_equation_method().test()
+
     ## 一元线性回归，欠拟合
     # multiple_linear_regression_test()
 
@@ -268,7 +286,4 @@ if __name__=="__main__":
 
     ## 一元四阶多项式线性回归，过拟合 
     # quartic_polynomial_regression_test()
-    print ("\n")
-    print (os.environ)
-    print ("\n")
-        
+
