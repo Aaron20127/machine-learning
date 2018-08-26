@@ -919,7 +919,170 @@ class osPathTest:
         sys.path.insert(2, "/test3") #添加到第三个位置
         print(sys.path)
 
+ ### list.sort()排序
+ # http://www.runoob.com/python/att-list-sort.html
+ # 列表
+class listSortTest():
+    @staticmethod
+    def test():
+        # 1.降序
+        list_1 = [4, 2, 3, 1]
+        list_1.sort(reverse=True)
+        print("降序:", list_1)
+
+        # 2.升序
+        list_1.sort() # 默认升序
+        print("升序:", list_1) 
+
+        # 3.按元素的第二个元素排序
+        # 获取列表的第二个元素
+        def takeSecond(elem):
+            return elem[1]
         
+        random = [(2, 2), (3, 4), (4, 1), (1, 3)]    
+        random.sort(key=takeSecond) # 指定第二个元素排序，默认升序
+        print ('指定元素第二个元素排序:', random) # 输出类别
+
+
+### python 类的测试
+# http://www.runoob.com/python/python-object.html
+class classTest:
+
+    @ staticmethod
+    def test():
+        class Employee:
+            '''所有员工的基类'''
+            empCount = 0 # 类变量被所有实例共用
+            
+            def __init__(self, name, salary):
+                ''''''
+                self.name = name
+                self.salary = salary
+                Employee.empCount += 1 # 类变量在每次创建对象时自动加一
+
+            def __del__(self):
+                '''析构函数'''
+                class_name = self.__class__.__name__
+                print (class_name, "销毁")
+            
+            def displayCount(self):
+                print ("Total Employee %d" % Employee.empCount)
+            
+            def displayEmployee(self):
+                print ("Name : ", self.name,  ", Salary: ", self.salary)
+        
+        # 1.创建类对象
+        print("1.创建类对象")
+        emp1 = Employee("Zara", 2000)
+        emp1.displayEmployee()
+        print ("Total Employee %d" % Employee.empCount)
+
+        # 2.添加、修改、删除类变量
+        print("\n2.添加、修改、删除类变量")
+        emp1.age = 7  # 添加一个 'age' 属性
+        emp1.age = 8  # 修改 'age' 属性
+
+        print (hasattr(emp1, 'age'))    # 如果存在 'age' 属性返回 True。
+        setattr(emp1, 'age', 9) # 添加属性 'age' 值为 9
+        print (getattr(emp1, 'age'))    # 返回 'age' 属性的值
+        # delattr(emp1, 'age')    # 删除属性 'age'
+
+        # 3.类的固有属性
+        print("\n3.类的固有属性")
+        print ("Employee.__doc__:", Employee.__doc__)  # 类的文档
+        print ("Employee.__name__:", Employee.__name__)  # 类的名称
+        print ("Employee.__module__:", Employee.__module__) # 类所在模块
+        print ("Employee.__bases__:", Employee.__bases__) # 类的所有父类构成元素
+        print ("Employee.__dict__:", Employee.__dict__) # 类的所有属性
+
+        # 4.类的引用为0，则自动回收，调用析构函数。
+        print("\n4.类的引用为0，则自动回收，调用析构函数")
+        pt1 = Employee("Zara", 2000)
+        pt2 = pt1
+        pt3 = pt1
+        print (id(pt1), id(pt2), id(pt3)) # 打印对象的id
+        del pt1
+        del pt2
+        del pt3
+
+        # 5.派生类
+        class Parent:        # 定义父类
+            def __init__(self):
+                print ("调用父类构造函数")
+            
+            def parentMethod(self):
+                print ('调用父类方法')
+
+            def myMethod(self):
+                print ('调用父类方法')
+            
+        class Child(Parent): # 定义子类
+            def __init__(self):
+                print ("调用子类构造方法")
+            
+            def childMethod(self):
+                print ('调用子类方法')
+
+            def myMethod(self):
+                print ('调用子类方法')
+
+        print("\n5.派生类")
+        c = Child()          # 实例化子类
+        c.childMethod()      # 调用子类的方法
+        c.parentMethod()     # 调用父类方法
+        c.myMethod()         # 运算符重载
+
+        # 6.运算符重载
+        print("\n6.运算符重载")
+        class Vector:
+            def __init__(self, a, b):
+                self.a = a
+                self.b = b
+            
+            def __str__(self):
+                '''print 打印这个类会自动重载，调用这个函数，返回字符串'''
+                print("__str__")
+                return 'Vector (%d, %d)' % (self.a, self.b)
+            
+            def __add__(self, other):
+                print("__add__")
+                return Vector(self.a + other.a, self.b + other.b)
+            
+        v1 = Vector(1,1)
+        v2 = Vector(2,-2)
+        print (v1 + v2)
+
+        # 7.类私有变量和私有方法
+        print("\n7.类私有变量和私有方法")
+        class JustCounter:
+            publicCount = 0    # 公开变量
+            _protectedCount = 0 # 保护变量
+            __secretCount = 0  # 私有变量
+
+        
+            def count(self):
+                self.__secretCount += 1
+                self.publicCount += 1
+                print('公有方法')
+                self._count()
+                self.__count()
+            
+            def _count(self):
+                print ('保护方法')
+
+            def __count(self):
+                print ('私有方法')
+        
+        counter = JustCounter()
+        # 访问变量
+        print (counter.publicCount)
+        # print (counter.__secretCount)  # 报错，实例不能直接访问私有变量
+        print (counter._JustCounter__secretCount) # 使用object._className__attrName可以访问私有变量
+        # 访问函数
+        counter.count()
+        counter._JustCounter__count() # 私有方法的特殊访问方式
+        
+
 
 if __name__=="__main__":
     # mnistTest().test()
@@ -927,6 +1090,7 @@ if __name__=="__main__":
     # threadTest().test()
     # staticVariableTest().test()
     # matrixTest().test_2()
+        	
     # plotTest().test()
     # imagShowTest().test()
     # eulerQuaternionsTest().test()
@@ -934,7 +1098,10 @@ if __name__=="__main__":
     # dynamicPlotTest().interactiveTest()
     # dynamicPlotTest().animationTest()
 
-    osPathTest.test()
+    # osPathTest.test()
+    # listSortTest.test()
+
+    classTest.test()
 
 
 
