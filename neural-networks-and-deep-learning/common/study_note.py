@@ -1082,6 +1082,41 @@ class classTest:
         counter.count()
         counter._JustCounter__count() # 私有方法的特殊访问方式
         
+### 小段代码或函数执行时间测试
+# https://blog.csdn.net/Calling_Wisdom/article/details/41349605
+class timeitTest():
+
+    @staticmethod
+    def test():
+        def myfun():
+            for i in range(100):
+                for j in range(2, 10):
+                    math.pow(i, 1/j)
+        
+        import timeit
+        import math
+        import pprint
+        n = 100
+        
+        # 1.timeit.timeit
+        print('1.timeit.timeit')
+        t1 = timeit.timeit(stmt=myfun, number=n)
+        pprint.pprint(t1)
+
+        # 2.timeit.repeat，重复执行多次
+        print('\n2.timeit.repeat')
+        t2 = timeit.repeat(stmt=myfun, number=n, repeat=5) # 重复执行5次返回一个元组
+        pprint.pprint(t2)
+        
+        print()
+        
+        # 3.先使用timeit.Timer，再使用timeit和repeat
+        print('\n3.timeit.Timer')
+        timeitObj = timeit.Timer(stmt=myfun)
+        t3 = timeitObj.timeit(number=n)
+        pprint.pprint(t3)
+        t4 = timeitObj.repeat(number=n, repeat=5)
+        pprint.pprint(t4)
 
 
 if __name__=="__main__":
@@ -1101,7 +1136,8 @@ if __name__=="__main__":
     # osPathTest.test()
     # listSortTest.test()
 
-    classTest.test()
+    # classTest.test()
+    timeitTest.test()
 
 
 
