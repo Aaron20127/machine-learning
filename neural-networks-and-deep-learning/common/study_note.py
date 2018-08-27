@@ -1118,6 +1118,136 @@ class timeitTest():
         t4 = timeitObj.repeat(number=n, repeat=5)
         pprint.pprint(t4)
 
+### 二分查找算法，有递归，非递归，和系统库函数。
+# https://kuanghy.github.io/2016/06/14/python-bisect
+
+class binarySearch():
+
+    def binary_search_recursion(self, lst, value, low, high):
+        '''递归二分查找'''
+        if high < low:
+            return None
+        mid = (low + high) // 2
+        if lst[mid] > value:
+            return self.binary_search_recursion(lst, value, low, mid-1)
+        elif lst[mid] < value:
+            return self.binary_search_recursion(lst, value, mid+1, high)
+        else:
+            return mid
+
+    def binary_search_loop(self, lst, value):
+        '''循环二分查找'''
+        low, high = 0, len(lst)-1
+        while low <= high:
+            mid = (low + high) // 2
+            if lst[mid] < value:
+                low = mid + 1
+            elif lst[mid] > value:
+                high = mid - 1
+            else:
+                return mid
+        return None
+
+    def binary_search_bisect(self, lst, x):
+        '''bisect自带的查找函数bisect_left，其返回x应插入列表的位置，如果列表中有多个
+           相同的值，则返回最左边那个应该插入的位置        
+        '''
+        from bisect import bisect_left
+        i = bisect_left(lst, x)
+        if i != len(lst) and lst[i] == x:
+            return i
+        return None
+
+    def binary_search_searchsorted(self, lst, x):
+        '''numpy库自带的查找算法，和bisect用法基本相同，相同的值默认从最左边插入。
+           使用narray比普通元素查找更快
+        '''
+        from numpy import searchsorted
+        i = searchsorted(lst, x)
+        if i != len(lst) and lst[i] == x:
+            return i
+        return None
+
+    def test(self):
+        import numpy as np
+        lst = range(10000)
+        lst_array = np.array(lst)
+
+        def test_recursion():
+            '表是元组'
+            self.binary_search_recursion(lst, 999, 0, len(lst)-1)
+
+        def test_recursion_array():
+            '表是narray'
+            self.binary_search_recursion(lst_array, 999, 0, len(lst)-1)
+
+        def test_loop():
+            self.binary_search_loop(lst, 999)
+
+        def test_loop_array():
+            self.binary_search_loop(lst_array, 999)
+
+        def test_bisect():
+            self.binary_search_bisect(lst, 999)
+
+        def test_bisect_array():
+            self.binary_search_bisect(lst_array, 999)
+
+        def test_searchsorted():
+            self.binary_search_searchsorted(lst, 999)
+        
+        def test_searchsorted_array():
+            self.binary_search_searchsorted(lst_array, 999)
+
+        import timeit
+        # 1.连续执行次数较少，表使用元组时，loop最快，使用narray时，Searchsorted最快
+        # 2.recursion, loop, Bisect的顺序表使用元组更快，而Searchsorted使用元组超慢，使用narray最快
+        times = 10
+        t1 = timeit.timeit(stmt = test_recursion, number = times)
+        t2 = timeit.timeit(stmt = test_recursion_array, number = times)
+
+        t3 = timeit.timeit(stmt = test_loop, number = times)
+        t4 = timeit.timeit(stmt = test_loop_array, number = times)
+
+        t5 = timeit.timeit(stmt = test_bisect, number = times)
+        t6 = timeit.timeit(stmt = test_bisect_array, number = times)
+
+        t7 = timeit.timeit(stmt = test_searchsorted, number = times)
+        t8 = timeit.timeit(stmt = test_searchsorted_array, number = times)
+
+        print ("times: ", times)
+        print ("Recursion:", t1)
+        print ("Recursion Array:", t2)
+        print ("Loop:", t3)
+        print ("Loop Array:", t4)
+        print ("Bisect:", t5)
+        print ("Bisect Array:", t6)
+        print ("Searchsorted:", t7)
+        print ("Searchsorted Array:", t8)
+
+        # 2.连续执行次数较多，Searchsorted narray查找最快
+        times = 10000
+        t1 = timeit.timeit(stmt = test_recursion, number = times)
+        t2 = timeit.timeit(stmt = test_recursion_array, number = times)
+
+        t3 = timeit.timeit(stmt = test_loop, number = times)
+        t4 = timeit.timeit(stmt = test_loop_array, number = times)
+
+        t5 = timeit.timeit(stmt = test_bisect, number = times)
+        t6 = timeit.timeit(stmt = test_bisect_array, number = times)
+
+        t7 = timeit.timeit(stmt = test_searchsorted, number = times)
+        t8 = timeit.timeit(stmt = test_searchsorted_array, number = times)
+
+        print ("\ntimes: ", times)
+        print ("Recursion:", t1)
+        print ("Recursion Array:", t2)
+        print ("Loop:", t3)
+        print ("Loop Array:", t4)
+        print ("Bisect:", t5)
+        print ("Bisect Array:", t6)
+        print ("Searchsorted:", t7)
+        print ("Searchsorted Array:", t8)
 
 if __name__=="__main__":
     # mnistTest().test()
@@ -1137,7 +1267,8 @@ if __name__=="__main__":
     # listSortTest.test()
 
     # classTest.test()
-    timeitTest.test()
+    # timeitTest.test()
+    binarySearch().test()
 
 
 
