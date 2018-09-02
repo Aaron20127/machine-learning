@@ -20,6 +20,8 @@ import random
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 
+import multiprocessing
+
 def h_print(string):
     print ('\n--------------------------------------------')
     print (string)
@@ -478,7 +480,7 @@ class threadTest:
         print (arg)
 
     def test(self):
-        for i in xrange(10):
+        for i in range(10):
             arg = {"num" : i, "go" : "haha"}
             t =threading.Thread(target=self.action,args=(arg,))
             t.start()
@@ -1249,6 +1251,82 @@ class binarySearch():
         print ("Searchsorted:", t7)
         print ("Searchsorted Array:", t8)
 
+
+### 创建多进程和并使用Queue通信
+#https://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/0013868323401155ceb3db1e2044f80b974b469eb06cb43000
+
+class registerNewProcess:
+    "创建一个子进程，该进程能实时运行，并使用注册的函数处理queue中接收到的数据"
+    def __init__(self, fun):
+        self.fun = fun
+        self.q = multiprocessing.Queue()
+        self.pro_run = multiprocessing.Process(target=self.run, args=())
+        self.pro_run.start()
+        # pw.join() # 等待pw结束:
+
+    def run(self):
+        """子进程入口函数
+        """
+        while True:
+            val = self.q.get(True)
+            self.fun(val)
+
+    def put(self, val):
+        """向子进程传入数据的方法
+        """
+        self.q.put(val)
+
+    def __del__(self):
+        """调用析构函数结束子进程
+        """
+        # print("terminate")
+        self.pro_run.terminate()
+
+class processTest:
+    def processWrite(self, q):
+        """向Queue中写数据的进程
+        """
+        value = "processWrite"
+        q.put(value)
+        time.sleep(random.random())
+
+    def processRead(self, q):
+        """从Queue中读数据的进程
+        """
+        while True:
+            value = q.get(True)
+            print ('Get %s ' % value)
+
+    def test_1(self):
+        """三个进程通过Queue进行数据通信
+        """
+        from multiprocessing import Process, Queue
+
+        # 1. 父进程创建Queue，并传给各个子进程：
+        q = Queue()
+        pw = Process(target=self.processWrite, args=(q,))
+        pr = Process(target=self.processRead, args=(q,))
+
+        # 2. 启动子进程pw，将数据写入Queue中
+        pw.start()
+        pw.join() # 等待pw结束:
+
+        # 3. 在主进程中向Queue写入数据
+        q.put("main")
+
+        # 4. 启动子进程pr，读取:
+        pr.start()
+        time.sleep(1)
+        pr.terminate() # pr进程里是死循环，无法等待其结束，只能强行终止:
+
+    def test_2(self):
+        """创建一个子进程，并注册子进程运行的处理函数，
+           使用put方法实时将数据传入子进程
+        """
+        p = registerNewProcess(print)
+        p.put("haha")
+
+
 if __name__=="__main__":
     # mnistTest().test()
     # cPickleTest().test_3()
@@ -1268,7 +1346,7 @@ if __name__=="__main__":
 
     # classTest.test()
     # timeitTest.test()
-    binarySearch().test()
+    # binarySearch().test()
 
-
-
+    # processTest().test_1()
+    processTest().test_2()
