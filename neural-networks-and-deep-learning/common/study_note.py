@@ -1255,21 +1255,22 @@ class binarySearch():
 ### 创建多进程和并使用Queue通信
 #https://www.liaoxuefeng.com/wiki/001374738125095c955c1e6d8bb493182103fac9270762a000/0013868323401155ceb3db1e2044f80b974b469eb06cb43000
 
-class registerNewProcess:
+class NewQueueProcess:
     "创建一个子进程，该进程能实时运行，并使用注册的函数处理queue中接收到的数据"
     def __init__(self, fun):
+        self.j_data = {}
         self.fun = fun
         self.q = multiprocessing.Queue()
-        self.pro_run = multiprocessing.Process(target=self.run, args=())
+        self.pro_run = multiprocessing.Process(target=self.run, args=(self.q, self.fun,))
         self.pro_run.start()
         # pw.join() # 等待pw结束:
 
-    def run(self):
+    def run(self, q, fun):
         """子进程入口函数
         """
         while True:
-            val = self.q.get(True)
-            self.fun(val)
+            val = q.get(True)
+            fun(val)
 
     def put(self, val):
         """向子进程传入数据的方法
@@ -1279,7 +1280,31 @@ class registerNewProcess:
     def __del__(self):
         """调用析构函数结束子进程
         """
-        # print("terminate")
+        self.pro_run.terminate()
+
+class NewPipProcess:
+    "创建一个子进程，该进程能实时运行，并使用注册的函数处理queue中接收到的数据"
+    def __init__(self, fun):
+        self.parent_pip, child_pip = multiprocessing.Pipe()
+        self.pro_run = multiprocessing.Process(target=self.run, args=(child_pip, fun,))
+        self.pro_run.start()
+        # pw.join() # 等待pw结束:
+
+    def run(self, pip, fun):
+        """子进程入口函数
+        """
+        while True:
+            val = pip.recv()
+            fun(val)
+
+    def put(self, val):
+        """向子进程传入数据的方法
+        """
+        self.parent_pip.send(val)
+
+    def __del__(self):
+        """调用析构函数结束子进程
+        """
         self.pro_run.terminate()
 
 class processTest:
@@ -1323,9 +1348,46 @@ class processTest:
         """创建一个子进程，并注册子进程运行的处理函数，
            使用put方法实时将数据传入子进程
         """
-        p = registerNewProcess(print)
-        p.put("haha")
+        # 1.使用Queue通信
+        q = NewQueueProcess(print)
+        q.put("NewQueueProcess")
 
+        # 2.使用pip通信
+        p = NewPipProcess(print)
+        p.put("NewPipProcess")
+        time.sleep(5)
+
+
+### 利用多核并行计算
+# https://morvanzhou.github.io/tutorials/python-basic/multiprocessing/5-pool/
+class multiprocessingPoolMapTest:
+    def job(self, x):
+        return x*x
+
+    def multicore(self):
+        import multiprocessing as mp
+
+        ## 1.使用3个核运算，默认是所有的核
+        pool = mp.Pool(3) 
+        # 同时放入10个参数，并行计算
+        res = pool.map(self.job, range(9000000))
+        print(res)
+
+        # 2. apply_asyncy一次只能放入一个参数
+        res = pool.apply_async(self.job, (2,))
+        # 用get获得结果
+        print(res.get())
+
+        # 3.迭代器，同时计算多个函数
+        multi_res = [pool.apply_async(self.job, (i,)) for i in range(10)]
+        # 从迭代器中取出
+        print([res.get() for res in multi_res])
+    
+    def test(self):
+        """使用timeit.timeit进行时间测量，1个核时确实要比4个
+           核慢一些
+        """
+        self.multicore()
 
 if __name__=="__main__":
     # mnistTest().test()
@@ -1350,3 +1412,5 @@ if __name__=="__main__":
 
     # processTest().test_1()
     processTest().test_2()
+
+    # multiprocessingPoolMapTest().test()
