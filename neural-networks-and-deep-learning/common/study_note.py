@@ -239,7 +239,7 @@ class plotTest:
     def plot_base(self, y_coordinate, x_coordinate = [], line_lable = [], 
                 line_color = [], title = '', x_lable = '', y_lable = '',
                 x_limit = [], y_limit = [], y_scale = 'linear', p_type = [],
-                grad = False):
+                grad = False, axis_equal = False):
         """
         描述：画一幅坐标曲线图，可以同时有多条曲线
         参数：y_coordinate （y坐标值，二元列表，例如[[1,2,3],[4,5,6]]，表示有两条曲线，每条曲线的y坐标为[1,2,3]和[4,5,6]）
@@ -309,6 +309,8 @@ class plotTest:
         if x_limit: ax.set_xlim(x_limit) # x坐标显示的范围
         if y_limit: ax.set_ylim(y_limit) # y坐标显示范围
         
+        if axis_equal: plt.axis("equal") # 横坐标和纵坐标的单位长度相同
+
         # plt.xticks()
         # plt.yticks()
         plt.legend(loc="best") # 线条的名称显示在右下角
@@ -1269,7 +1271,7 @@ class NewQueueProcess:
         """子进程入口函数
         """
         while True:
-            val = q.get(True)
+            val = q.get(True, 1)
             fun(val)
 
     def put(self, val):

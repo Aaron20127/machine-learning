@@ -263,7 +263,8 @@ def quartic_polynomial_regression_test():
             title = 'quartic_polynomial_regression (overfit)',
             x_lable = 'y',
             y_lable = 'x',
-            p_type = ['scatter','line']) 
+            p_type = ['scatter','line'],
+            axis_equal = True) 
 
     x, y, theta = get_training_data()
     method = linear_regression(x, y, theta)
@@ -276,7 +277,7 @@ def quartic_polynomial_regression_test():
 
 if __name__=="__main__":
     #标准方程法求解
-    standard_equation_method().test()
+    # standard_equation_method().test()
 
     ## 一元线性回归，欠拟合
     # multiple_linear_regression_test()
@@ -285,5 +286,5 @@ if __name__=="__main__":
     # quadratic_polynomial_regression_test()
 
     ## 一元四阶多项式线性回归，过拟合 
-    # quartic_polynomial_regression_test()
+    quartic_polynomial_regression_test()
 
