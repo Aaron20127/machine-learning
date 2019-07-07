@@ -1,2 +1,2 @@
 # machine-learning
-older code, with some reference value.
+Older code, with some reference value.
