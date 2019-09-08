@@ -59,14 +59,14 @@ def plot(arg):
                 arg_type_list.append(type[2])
                 valide = True
         if not valide:
-            print "Error: Invalid parameter \'%s\' !" % (ag)
+            print ("Error: Invalid parameter \'%s\' !" % (ag))
             sys.exit()
 
     # 判断参数的类型，如果参数不是同一个类型则报错
     first_arg_type = arg_type_list[0]
     for arg_type in arg_type_list[1:]:
         if first_arg_type != arg_type:
-            print "Error: Parameter types are inconsistent !"
+            print ("Error: Parameter types are inconsistent !")
             sys.exit()
 
     # 将画每幅图需要的文件和参数放入在一起
@@ -79,7 +79,7 @@ def plot(arg):
             feature_arg = [feature_list, [ag]] 
             feature_arg_list.append(feature_arg)
     else:
-        print "Invade command:", arg
+        print ("Invade command:", arg)
         sys.exit()
 
     plot_figure.plot_figure_from_feature_arg_list(feature_arg_list)
@@ -121,20 +121,20 @@ def execute_command(argv):
 
         if opt == '-h':
             # 
-            print '-p  : [ta ea] | [tc ec] | [bg1 bg2 ... bgo]， 需要画出的数据类型， 必须是同种数据类型 \n'+ \
+            print ('-p  : [ta ea] | [tc ec] | [bg1 bg2 ... bgo]， 需要画出的数据类型， 必须是同种数据类型 \n'+ \
                   '-t  : 0, 1, 2 ...， 执行第几个示例\n'+\
                   '-f  : *.net， 绘图时指定的文件\n' + \
                   '-e  : 同一个文件的同类型参数画在一幅图中\n' + \
-                  '-a  : 不同文件的同类型参数画在一幅图中'
+                  '-a  : 不同文件的同类型参数画在一幅图中')
 
             # 执行第1个注册的训练函数
-            print 'main.py -t 1' 
+            print ('main.py -t 1' )
             # 将test_0.net和test_1.net的training_accuracy画在一起，
             # 将test_0.net和test_1.net的evaluation_cost画在一起
-            print 'main.py -p ta ea -f test_0.net test1.net -a'
+            print ('main.py -p ta ea -f test_0.net test1.net -a')
             # 将test_0.net的training_accuracy和evaluation_cost分别画在一起
             # 将test_1.net的training_accuracy和evaluation_cost分别画在一起
-            print 'main.py -p ta ea -f test_0.net test1.net -e'
+            print ('main.py -p ta ea -f test_0.net test1.net -e')
             sys.exit()
         elif opt in ("-t", "--train"):
             cmd_train["function"] = arg
@@ -147,8 +147,8 @@ def execute_command(argv):
         elif opt in ("-e", "--each"):
             cmd_plot["tag"] = 'each'
         else:
-            print "Invade command:", opt
-            print "Exit !"
+            print ("Invade command:", opt)
+            print ("Exit !")
             sys.exit()
 
     if cmd_train["function"]:

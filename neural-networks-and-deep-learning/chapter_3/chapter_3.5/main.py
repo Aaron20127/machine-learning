@@ -15,7 +15,7 @@ def test_0(training_data, validation_data, test_data):
         """eta = 0.025
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
         net.SGD(training_data, 30, 10, 0.025, lmbda=5.0,
                 evaluation_data = validation_data,
@@ -31,7 +31,7 @@ def test_1(training_data, validation_data, test_data):
         """eta = 0.25
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
         net.SGD(training_data, 30, 10, 0.25, lmbda=5.0,
                 evaluation_data = validation_data,
@@ -47,7 +47,7 @@ def test_2(training_data, validation_data, test_data):
         """eta = 2.5
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
         net.SGD(training_data, 30, 10, 2.5, lmbda=5.0,
                 evaluation_data = validation_data,
@@ -60,10 +60,10 @@ def test_2(training_data, validation_data, test_data):
                 B_show_figure_feature=False)
 
 def test_3(training_data, validation_data, test_data):
-        """ momentum = False
+        """ (momentum = False)
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
         net.SGD(training_data, 100, 10, 0.05, lmbda=0,
                 evaluation_data = validation_data,
@@ -79,7 +79,7 @@ def test_4(training_data, validation_data, test_data):
         """momentum = True, 梯度下降加速
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost, momentum=True)
         net.SGD(training_data, 100, 10, 0.05, lmbda=0,
                 evaluation_data = validation_data,

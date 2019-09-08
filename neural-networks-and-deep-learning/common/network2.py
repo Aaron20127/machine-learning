@@ -131,7 +131,7 @@ class Network(object):
         layers.
         """
 
-        self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]]
+        self.biases = [np.random.randn(y, 1) for y in self.sizes[1:]] # np.random.randn(y, 1), 返回array, shape(y,1)的标准正太分布
         self.weights = [np.random.randn(y, x)/np.sqrt(x)
                         for x, y in zip(self.sizes[:-1], self.sizes[1:])]
         self.figure_feature["title"]["weight"] = "default"        
@@ -191,7 +191,7 @@ class Network(object):
         are empty if the corresponding flag is not set.
         """
         self.figure_feature["title"]["training"] = len(training_data) 
-        self.figure_feature["title"]["evaluation"] = len(evaluation_data)         
+        self.figure_feature["title"]["evaluation"] = len(evaluation_data)   
         self.figure_feature["title"]["epochs"] = epochs
         self.figure_feature["title"]["batch_size"] = mini_batch_size
         self.figure_feature["title"]["eta"] = eta
@@ -200,11 +200,11 @@ class Network(object):
         if evaluation_data: n_data = len(evaluation_data)
         n = len(training_data)
 
-        for j in xrange(epochs):
+        for j in range(epochs):
             random.shuffle(training_data)
             mini_batches = [
                 training_data[k:k+mini_batch_size]
-                for k in xrange(0, n, mini_batch_size)]
+                for k in range(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(
                     mini_batch, eta, lmbda, len(training_data))
@@ -350,7 +350,7 @@ class Network(object):
         # second-last layer, and so on.  It's a renumbering of the
         # scheme in the book, used here to take advantage of the fact
         # that Python can use negative indices in lists.
-        for l in xrange(2, self.num_layers):
+        for l in range(2, self.num_layers):
             z = zs[-l]
             sp = sigmoid_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(), delta) * sp

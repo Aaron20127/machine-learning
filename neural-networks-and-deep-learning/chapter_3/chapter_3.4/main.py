@@ -16,7 +16,7 @@ def test_0(training_data, validation_data, test_data):
         """使用eta=10， lmbda=1000，训练网络
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30,10], cost=network2.CrossEntropyCost)
         net.SGD(training_data, 30, 10, 10.0, lmbda=1000.0,
                 evaluation_data = validation_data,
@@ -32,7 +32,7 @@ def test_1(training_data, validation_data, test_data):
         """使用小样本快速的训练
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 10], cost=network2.CrossEntropyCost)
         net.SGD(training_data[:1000], 30, 10, 10.0, lmbda=1000.0,
                 evaluation_data = validation_data[:100],
@@ -45,10 +45,10 @@ def test_1(training_data, validation_data, test_data):
                 B_show_figure_feature=False)
 
 def test_2(training_data, validation_data, test_data):
-        """在test_2中使用小样本的基础上，改变参数，快速获得训练的趋势
+        """在test_2中使用小样本的基础上，改变参数，快速获得训练的趋势, lmbda=20
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 10], cost=network2.CrossEntropyCost)
         net.SGD(training_data[:1000], 30, 10, 10.0, lmbda=20.0,
                 evaluation_data = validation_data[:100],
@@ -64,7 +64,7 @@ def test_3(training_data, validation_data, test_data):
         """在test_3中使用小样本的基础上，改变参数，使eta=100，发现效果并不是很好
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 10], cost=network2.CrossEntropyCost)
         net.SGD(training_data[:1000], 30, 10, 100.0, lmbda=20.0,
                 evaluation_data = validation_data[:100],
@@ -80,7 +80,7 @@ def test_4(training_data, validation_data, test_data):
         """在test_4中使用小样本的基础上，改变参数，使eta=1，发现效果变好
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 10], cost=network2.CrossEntropyCost)
         net.SGD(training_data[:1000], 30, 10, 1.0, lmbda=20.0,
                 evaluation_data = validation_data[:100],
@@ -93,12 +93,12 @@ def test_4(training_data, validation_data, test_data):
                 B_show_figure_feature=False)
 
 def test_5(training_data, validation_data, test_data):
-        """在test_5中使用小样本的基础上，改变参数，使eta=1，加深神经网络效果更好
+        """在test_5中使用小样本的基础上，改变参数，使eta=1，加深神经网络,并调整lmbda=0.1,效果更好
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30, 10], cost=network2.CrossEntropyCost)
-        net.SGD(training_data[:1000], 150, 20, 0.041, lmbda= 0.1,
+        net.SGD(training_data[:1000], 30, 10, 0.041, lmbda= 0.1,
                 evaluation_data = validation_data[:100],
                 monitor_training_accuracy=True,
                 monitor_training_cost=False,

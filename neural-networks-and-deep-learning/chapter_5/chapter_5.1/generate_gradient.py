@@ -35,7 +35,7 @@ def main():
     epochs = 500 # Number of epochs to train for
 
 #### 
-    print "\nTwo hidden layers:"
+    print ("\nTwo hidden layers:")
     net = network2.Network([784, 30, 30, 10])
     initial_norms(td, net)
     training(td, net, epochs, "norms_during_training_2_layers.json")
@@ -43,7 +43,7 @@ def main():
         epochs, "norms_during_training_2_layers.json", 2)
 
 #### 
-    print "\nThree hidden layers:"
+    print ("\nThree hidden layers:")
     net = network2.Network([784, 30, 30, 30, 10])
     initial_norms(td, net)
     training(td, net, epochs, "norms_during_training_3_layers.json")
@@ -51,7 +51,7 @@ def main():
         epochs, "norms_during_training_3_layers.json", 3)
 
 #### 
-    print "\nFour hidden layers:"
+    print ("\nFour hidden layers:")
     net = network2.Network([784, 30, 30, 30, 30, 10])
     initial_norms(td, net)
     training(td, net, epochs, 
@@ -62,14 +62,14 @@ def main():
 def initial_norms(training_data, net):
     average_gradient = get_average_gradient(net, training_data)
     norms = [list_norm(avg) for avg in average_gradient[:-1]] #只要前边两层
-    print "Average gradient for the hidden layers: "+str(norms)
+    print ("Average gradient for the hidden layers: "+str(norms))
     
 def training(training_data, net, epochs, filename):
     norms = []
     for j in range(epochs):
         average_gradient = get_average_gradient(net, training_data) # 在当前权重和偏置的基础上计算梯度
         norms.append([list_norm(avg) for avg in average_gradient[:-1]])
-        print "Epoch: %s" % j
+        print ("Epoch: %s" % j)
         net.SGD(training_data, 1, 1000, 0.1, lmbda=5.0, evaluation_data=[]) # 为了梯度计算准确，不使用minibatch
     f = open(filename, "w")
     json.dump(norms, f)

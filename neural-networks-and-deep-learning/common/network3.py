@@ -28,7 +28,7 @@ versions of Theano.
 
 #### Libraries
 # Standard library
-import cPickle
+import pickle
 import gzip
 
 # Third-party libraries
@@ -53,19 +53,19 @@ from theano.tensor import tanh
 # GPU = True
 GPU = False
 if GPU:
-    print "Trying to run under a GPU.  If this is not desired, then modify "+\
-        "network3.py\nto set the GPU flag to False."
+    print ("Trying to run under a GPU.  If this is not desired, then modify "+\
+        "network3.py\nto set the GPU flag to False.")
     try: theano.config.device = 'gpu'
     except: pass # it's already set
     theano.config.floatX = 'float32'
 else:
-    print "Running with a CPU.  If this is not desired, then the modify "+\
-        "network3.py to set\nthe GPU flag to True."
+    print ("Running with a CPU.  If this is not desired, then the modify "+\
+        "network3.py to set\nthe GPU flag to True.")
 
 #### Load the MNIST data
 def load_data_shared(filename="../../minst-data/data/mnist.pkl.gz"):
     f = gzip.open(filename, 'rb')
-    training_data, validation_data, test_data = cPickle.load(f)
+    training_data, validation_data, test_data = pickle.load(f)
     f.close()
     def shared(data):
         """Place the data into shared variables.  This allows Theano to copy

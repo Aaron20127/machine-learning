@@ -22,7 +22,7 @@ def test_0():
     """全连接 + 全连接 + softmax, 测试准确率97:80%
     """
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     training_data, validation_data, test_data = network3.load_data_shared()
 
@@ -37,7 +37,7 @@ def test_1():
     """全连接 + 卷积混合层 + softmax，测试准确率98.48%
     """
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     training_data, validation_data, test_data = network3.load_data_shared()
 
@@ -55,7 +55,7 @@ def test_2():
     """
 
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     training_data, validation_data, test_data = network3.load_data_shared()
 
@@ -73,7 +73,7 @@ def test_3():
     """全连接 + 卷积混合层 + 卷积混合层 + 全连接 + softmax，测试准确率99.09%
     """
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     training_data, validation_data, test_data = network3.load_data_shared()
     mini_batch_size = 10
@@ -98,7 +98,7 @@ def test_4():
     """
 
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     training_data, validation_data, test_data = network3.load_data_shared()
     mini_batch_size = 10
@@ -126,7 +126,7 @@ def test_5():
        测试准确率：99.44%
     """
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     # 扩展数据集多扩展4倍
     src_path='../../minst-data/data/mnist.pkl.gz'
@@ -162,7 +162,7 @@ def test_6():
        测试准确率：99.45% (60 epochs), 99.58% (600 epochs)
     """
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     # 扩展数据集多扩展8倍
     src_path='../../minst-data/data/mnist.pkl.gz'
@@ -198,7 +198,7 @@ def test_7():
        测试准确率：99.49%
     """
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     # 扩展数据集
     expand_mnist.expand_mnist_data()
@@ -233,7 +233,7 @@ def test_8():
        测试准确率：99.57%
     """
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     # 扩展数据集
     expand_mnist.expand_mnist_data()
@@ -270,7 +270,7 @@ def test_9():
        测试准确率：99.70% (1000 epoch)
     """
     name = sys._getframe().f_code.co_name
-    print name + "\n"
+    print (name + "\n")
 
     # 扩展数据集
     src_path='../../minst-data/data/mnist.pkl.gz'

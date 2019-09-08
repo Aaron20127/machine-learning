@@ -16,7 +16,7 @@ def test_0(training_data, validation_data, test_data):
         """使用1/sqrt(n)初始化权重的方法
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30,10], cost=network2.CrossEntropyCost)
         net.SGD(training_data, 30, 10, 0.1, lmbda=5.0,
                 evaluation_data = validation_data,
@@ -32,7 +32,7 @@ def test_1(training_data, validation_data, test_data):
         """使用标准正太分布初始化权重的方法
         """
         name = sys._getframe().f_code.co_name
-        print name + "\n"
+        print (name + "\n")
         net = network2.Network([784, 30,10], cost=network2.CrossEntropyCost)
         net.large_weight_initializer()
         net.SGD(training_data, 30, 10, 0.1, lmbda=5.0,

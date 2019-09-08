@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: UTF8 -*-
+
 
 """
 mnist_loader
@@ -12,7 +11,7 @@ function usually called by our neural network code.
 
 #### Libraries
 # Standard library
-import cPickle
+import _pickle as cPickle
 import gzip
 
 # Third-party libraries
@@ -43,16 +42,15 @@ def load_data():
     below.
     """
     f = gzip.open('../../minst-data/data/mnist.pkl.gz', 'rb')
-    training_data, validation_data, test_data = cPickle.load(f)
+    training_data, validation_data, test_data = cPickle.load(f, encoding='bytes')
     f.close()
     return (training_data, validation_data, test_data)
 
 def load_data_wrapper():
-    """训练数据training_data=(x)，x[0]有50000个元组，x[0][0]中有784个元组，每个
-    元组表示一个像素值，x[1]有10个元组，列表值表示0或1。例如x[1][0]=1，则表示第一幅图
-    数字是1，那么x[1][1]到x[1][9]都等于0.验证数据validation_data有10000个数据，与
-    trainong_data不同之处是x[1]等于0-9的值，而不是元组。测试数据test_data有10000个
-    数据，存储格式和测试数据一样。"""
+    """训练数据training_data=(x)，x[0]是shape为(5000,784)数组，数组每一行表示一幅图片。
+    x[1]的shape为(5000,), 每个值表示一幅图像的类别. 验证数据validation_data有10000个数据。
+    测试数据test_data有10000个
+    """
 
     """Return a tuple containing ``(training_data, validation_data,
     test_data)``. Based on ``load_data``, but the format is more
@@ -74,11 +72,11 @@ def load_data_wrapper():
     tr_d, va_d, te_d = load_data()
     training_inputs = [np.reshape(x, (784, 1)) for x in tr_d[0]] #将1*n的矩阵换成n*1矩阵
     training_results = [vectorized_result(y) for y in tr_d[1]] #将期望值的0-9换乘10*1的向量
-    training_data = zip(training_inputs, training_results)
+    training_data = list(zip(training_inputs, training_results))
     validation_inputs = [np.reshape(x, (784, 1)) for x in va_d[0]]
-    validation_data = zip(validation_inputs, va_d[1])
+    validation_data = list(zip(validation_inputs, va_d[1]))
     test_inputs = [np.reshape(x, (784, 1)) for x in te_d[0]]
-    test_data = zip(test_inputs, te_d[1])
+    test_data = list(zip(test_inputs, te_d[1]))
     return (training_data, validation_data, test_data)
 
 def vectorized_result(j):
