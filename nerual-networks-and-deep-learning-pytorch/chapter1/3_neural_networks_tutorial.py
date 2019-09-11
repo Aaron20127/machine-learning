@@ -46,24 +46,9 @@ print(net)
 
 ### 2.wights and bias of every layers
 print("\n>>>> 2.wights and bias of every layers >>>>")
-params = list(net.parameters())
-print(len(params))
-
-print(params[0].size())  # conv1's .weight, namely filter core
-print(params[1].size())  # conv1's .bais
-
-print(params[2].size())  # conv2's .weight, namely filter core
-print(params[3].size())  # conv2's .bais
-
-print(params[4].size())  # fc1's .weight
-print(params[5].size())  # fc1's .bais
-
-print(params[6].size())  # fc2's .weight
-print(params[7].size())  # fc2's .bais
-
-print(params[8].size())  # fc3's .weight
-print(params[9].size())  # fc3's .bais
-
+# net.named_parameters可同时返回可学习的参数及名称。一个卷积核一个偏置
+for name,parameters in net.named_parameters():
+    print(name,':',parameters.size())
 
 ### 3.forword and update grad
 print("\n>>>> 3.forword and update grad >>>>")
